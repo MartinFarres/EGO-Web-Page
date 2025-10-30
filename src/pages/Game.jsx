@@ -2,6 +2,10 @@ import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import StickerMatch from '../components/StickerMatch.jsx'
 import ZodiacGame from '../components/ZodiacGame.jsx'
+import TwoTruthsOneMask from '../components/TwoTruthsOneMask.jsx'
+import QrChallenge from '../components/QrChallenge.jsx'
+import SocialBingo from '../components/SocialBingo.jsx'
+import EgoOracle from '../components/EgoOracle.jsx'
 import { COLORS } from '../colors.js'
 import { Button } from '../components/ui/Button.jsx'
 
@@ -35,6 +39,10 @@ function Game() {
   const renderGame = () => {
     if (gameId === 'sticker-match') return <StickerMatch />
     if (gameId === 'trago-del-destino') return <ZodiacGame />
+    if (gameId === 'two-truths') return <TwoTruthsOneMask />
+    if (gameId === 'qr-challenge') return <QrChallenge />
+    if (gameId === 'social-bingo') return <SocialBingo />
+    if (gameId === 'ego-oracle') return <EgoOracle />
     return (
       <NotFound>
         <p style={{ fontSize: '48px', margin: '0 0 16px' }}>🤔</p>

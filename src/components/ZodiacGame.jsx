@@ -333,7 +333,7 @@ function ZodiacGame() {
 
   return (
     <Wrap>
-      <StyledPanel delay="0.2s">
+      <StyledPanel $delay="0.2s">
         <div>
           <Title>🍹✨ Tu Trago del Destino</Title>
           <Description>

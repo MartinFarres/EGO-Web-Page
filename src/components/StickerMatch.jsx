@@ -240,7 +240,7 @@ function StickerMatch() {
 
   return (
     <Wrap>
-      <StyledPanel delay="0.2s">
+      <StyledPanel $delay="0.2s">
         <div>
           <Title>💥 Sticker Match</Title>
           <Hint style={{ marginTop: '8px' }}>

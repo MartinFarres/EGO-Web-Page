@@ -33,7 +33,7 @@ const StyledButton = styled.button`
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
-  ${props => props.variant === 'primary' && css`
+  ${props => props.$variant === 'primary' && css`
     background: linear-gradient(135deg, ${COLORS.fireOrange}, ${COLORS.vitalYellow});
     color: ${COLORS.black};
     
@@ -47,7 +47,7 @@ const StyledButton = styled.button`
     }
   `}
 
-  ${props => props.variant === 'secondary' && css`
+  ${props => props.$variant === 'secondary' && css`
     background: ${COLORS.gold};
     color: ${COLORS.black};
     
@@ -58,7 +58,7 @@ const StyledButton = styled.button`
     }
   `}
 
-  ${props => props.variant === 'outline' && css`
+  ${props => props.$variant === 'outline' && css`
     background: transparent;
     color: ${COLORS.gold};
     border: 2px solid ${COLORS.gold};
@@ -69,7 +69,7 @@ const StyledButton = styled.button`
     }
   `}
 
-  ${props => props.animate && css`
+  ${props => props.$animate && css`
     animation: ${pulse} 2s ease-in-out infinite;
   `}
 
@@ -100,7 +100,7 @@ const StyledButton = styled.button`
 
 export function Button({ children, variant = 'primary', animate = false, ...props }) {
   return (
-    <StyledButton variant={variant} animate={animate} {...props}>
+    <StyledButton $variant={variant} $animate={animate} {...props}>
       {children}
     </StyledButton>
   )

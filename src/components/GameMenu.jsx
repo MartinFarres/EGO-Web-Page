@@ -64,8 +64,12 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
   
   @media (max-width: 480px) {
     gap: 12px;
@@ -178,7 +182,7 @@ function GameMenu() {
   return (
     <Section id="games">
       <Title>Elige tu Juego</Title>
-      <Description>Dos experiencias únicas para romper el hielo y conectar</Description>
+      <Description>Seis experiencias únicas para romper el hielo y conectar</Description>
       <Grid>
         <Card to="/game/sticker-match" $primary $delay={0.4} aria-label="Ir a Sticker Match">
           <IconWrapper>💥</IconWrapper>
@@ -187,11 +191,39 @@ function GameMenu() {
             <CardDescription>Encuentra tu match perfecto</CardDescription>
           </div>
         </Card>
-        <Card to="/game/trago-del-destino" $delay={0.6} aria-label="Ir a Tu Trago del Destino">
+        <Card to="/game/trago-del-destino" $delay={0.5} aria-label="Ir a Tu Trago del Destino">
           <IconWrapper>🍹✨</IconWrapper>
           <div>
             <CardTitle>Tu Trago del Destino</CardTitle>
             <CardDescription>Descubre tu desafío zodiacal</CardDescription>
+          </div>
+        </Card>
+        <Card to="/game/two-truths" $primary $delay={0.6} aria-label="Ir a Dos Verdades y una Máscara">
+          <IconWrapper>🎭</IconWrapper>
+          <div>
+            <CardTitle>Dos Verdades y una Máscara</CardTitle>
+            <CardDescription>¿Puedes adivinar la mentira?</CardDescription>
+          </div>
+        </Card>
+        <Card to="/game/qr-challenge" $delay={0.7} aria-label="Ir a QR Challenge">
+          <IconWrapper>📱</IconWrapper>
+          <div>
+            <CardTitle>QR Challenge</CardTitle>
+            <CardDescription>Escanea y acepta el reto</CardDescription>
+          </div>
+        </Card>
+        <Card to="/game/social-bingo" $primary $delay={0.8} aria-label="Ir a Social Bingo">
+          <IconWrapper>🎯</IconWrapper>
+          <div>
+            <CardTitle>Social Bingo</CardTitle>
+            <CardDescription>Completa las tareas sociales</CardDescription>
+          </div>
+        </Card>
+        <Card to="/game/ego-oracle" $delay={0.9} aria-label="Ir a EGO Oracle">
+          <IconWrapper>🔮</IconWrapper>
+          <div>
+            <CardTitle>EGO Oracle</CardTitle>
+            <CardDescription>Descubre tu arquetipo</CardDescription>
           </div>
         </Card>
       </Grid>

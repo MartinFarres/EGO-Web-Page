@@ -22,22 +22,22 @@ const shimmer = keyframes`
 `
 
 export const Card = styled.div`
-  background: ${props => props.gradient 
+  background: ${props => props.$gradient 
     ? `linear-gradient(135deg, ${COLORS.fireOrange}, ${COLORS.vitalYellow})`
     : '#0a0a0a'
   };
-  border: 1px solid ${props => props.borderColor || '#1d1d1d'};
+  border: 1px solid ${props => props.$borderColor || '#1d1d1d'};
   border-radius: 16px;
-  padding: ${props => props.padding || '20px'};
+  padding: ${props => props.$padding || '20px'};
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: ${fadeIn} 0.6s ease-out;
-  animation-delay: ${props => props.delay || '0s'};
+  animation-delay: ${props => props.$delay || '0s'};
   animation-fill-mode: backwards;
   position: relative;
   overflow: hidden;
 
-  ${props => props.hover && `
+  ${props => props.$hover && `
     &:hover {
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 16px 40px rgba(241, 107, 6, 0.3);
@@ -65,7 +65,7 @@ export const Card = styled.div`
     }
   `}
 
-  ${props => props.glow && `
+  ${props => props.$glow && `
     &::after {
       content: '';
       position: absolute;
@@ -89,9 +89,9 @@ export const Card = styled.div`
 
 export const Container = styled.div`
   width: 100%;
-  max-width: ${props => props.maxWidth || '720px'};
+  max-width: ${props => props.$maxWidth || '720px'};
   margin: 0 auto;
-  padding: ${props => props.padding || '16px'};
+  padding: ${props => props.$padding || '16px'};
 `
 
 export const Panel = styled(Card)`
