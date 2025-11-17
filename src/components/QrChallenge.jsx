@@ -201,8 +201,10 @@ function QrChallenge() {
     return challenges[randomIndex]
   })
   const [mode, setMode] = useState('show') // 'show' | 'scan'
+  const [qrFormat, setQrFormat] = useState('json') // 'json' | 'link'
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState('')
+  const [scanInfo, setScanInfo] = useState('')
   const [isLoadingScanner, setIsLoadingScanner] = useState(false)
   const videoRef = useRef(null)
   const scannerRef = useRef(null)
@@ -236,6 +238,7 @@ function QrChallenge() {
 
   const handleStartScanning = async () => {
     setError('')
+    setScanInfo('')
     setMode('scan')
     setIsScanning(true)
     setIsLoadingScanner(true)
@@ -261,32 +264,64 @@ function QrChallenge() {
       })
       if (videoRef.current) {
         videoRef.current.srcObject = stream
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play()
-        }
       }
 
-      // Dynamically import qr-scanner to avoid SSR issues
-      const { default: QrScanner } = await import('qr-scanner')
+      // Wait for video readiness
+      await new Promise(resolve => {
+        if (!videoRef.current) return resolve()
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play()
+          resolve()
+        }
+      })
+
+      // Dynamically import qr-scanner and set worker path for Vite
+      const qrModule = await import('qr-scanner')
+      const QrScanner = qrModule.default
+      // Attempt to set worker path (Vite will fingerprint the asset)
+      try {
+        QrScanner.WORKER_PATH = qrModule.WORKER_PATH || new URL('qr-scanner/qr-scanner-worker.min.js', import.meta.url).toString()
+      } catch (_) {
+        // Fallback: rely on internal worker if available
+      }
+
       scannerRef.current = new QrScanner(
         videoRef.current,
         result => {
-          if (!result?.data) return
+          if (!result) return
+          const raw = result.data || result // Support detailed or plain result
+          if (!raw) return
+          // Try JSON first
+          let parsed
           try {
-            const parsed = JSON.parse(result.data)
-            if (parsed.type === 'ego-challenge' && parsed.challengeId) {
-              const matched = challenges.find(c => c.id === parsed.challengeId)
-              if (matched) {
-                setCurrentChallenge(matched)
-              } else {
-                setCurrentChallenge({ id: 999, emoji: '❓', text: parsed.challenge || 'Reto desconocido' })
-              }
-              handleStopScanning()
-            } else {
-              setError('QR leído pero no es un reto válido.')
-            }
+            parsed = JSON.parse(raw)
           } catch (e) {
-            setError('Formato de QR no reconocido.')
+            // Maybe it's a link form
+            if (/ego-web-page/.test(raw)) {
+              const urlObj = new URL(raw)
+              const idParam = urlObj.searchParams.get('challengeId')
+              if (idParam) {
+                const matched = challenges.find(c => c.id === Number(idParam))
+                if (matched) {
+                  setCurrentChallenge(matched)
+                  handleStopScanning()
+                  return
+                }
+              }
+            }
+            setScanInfo('QR detectado pero no coincide con formato esperado.')
+            return
+          }
+          if (parsed?.type === 'ego-challenge' && parsed.challengeId) {
+            const matched = challenges.find(c => c.id === parsed.challengeId)
+            if (matched) {
+              setCurrentChallenge(matched)
+            } else {
+              setCurrentChallenge({ id: 999, emoji: '❓', text: parsed.challenge || 'Reto desconocido' })
+            }
+            handleStopScanning()
+          } else {
+            setScanInfo('QR leído pero no es un reto válido.')
           }
         },
         {
@@ -295,7 +330,9 @@ function QrChallenge() {
           maxScansPerSecond: 4
         }
       )
+      setScanInfo('Escaneando…')
       await scannerRef.current.start()
+      setScanInfo('Buscando código…')
     } catch (err) {
       console.error(err)
       setError('No se pudo acceder a la cámara o iniciar el escáner.')
@@ -317,11 +354,13 @@ function QrChallenge() {
     setMode('show')
   }
 
-  const qrData = JSON.stringify({
-    type: 'ego-challenge',
-    challengeId: currentChallenge.id,
-    challenge: currentChallenge.text
-  })
+  const qrData = qrFormat === 'json'
+    ? JSON.stringify({
+        type: 'ego-challenge',
+        challengeId: currentChallenge.id,
+        challenge: currentChallenge.text
+      })
+    : `${window.location.origin}/EGO-Web-Page/game/qr-challenge?challengeId=${currentChallenge.id}`
 
   return (
     <Wrap>
@@ -362,6 +401,9 @@ function QrChallenge() {
               <Button variant="secondary" onClick={handleStartScanning}>
                 📷 Escanear QR
               </Button>
+              <Button variant="outline" onClick={() => setQrFormat(f => f === 'json' ? 'link' : 'json')}>
+                {qrFormat === 'json' ? '🔗 Modo Link' : '🧱 Modo JSON'}
+              </Button>
             </ButtonGroup>
           </>
         ) : (
@@ -380,7 +422,7 @@ function QrChallenge() {
             </ScannerContainer>
             {!error && (
               <InfoBox>
-                {isLoadingScanner ? 'Preparando escáner…' : '📷 Apunta la cámara al código QR para escanearlo'}
+                {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '📷 Apunta la cámara al código QR para escanearlo'}
               </InfoBox>
             )}
             {error && <ErrorBox>{error}</ErrorBox>}
