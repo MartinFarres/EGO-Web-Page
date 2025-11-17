@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components'
 import { COLORS } from '../colors.js'
 import { Button } from './ui/Button.jsx'
 import { Panel, Container } from './ui/Card.jsx'
-import { QRCodeSVG } from 'react-qr-code'
+import QRCode from 'react-qr-code'
 
 const fadeIn = keyframes`
   from {
@@ -343,7 +343,7 @@ function QrChallenge() {
             </ChallengeCard>
 
             <QrContainer>
-              <QRCodeSVG 
+              <QRCode 
                 value={qrData}
                 size={200}
                 level="H"
