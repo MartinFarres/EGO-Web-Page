@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import styled, { keyframes } from 'styled-components'
 import { COLORS } from '../colors.js'
 import { Button } from './ui/Button.jsx'
@@ -111,6 +111,40 @@ const VideoElement = styled.video`
   display: block;
 `;
 
+const ErrorBox = styled.div`
+  background: #3b0d0d;
+  border: 1px solid #ff5555aa;
+  color: #ffdddd;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+`;
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${COLORS.black}aa;
+  backdrop-filter: blur(4px);
+  color: ${COLORS.white};
+  font-weight: 600;
+  font-size: 16px;
+`;
+
+const Spinner = styled.div`
+  width: 48px;
+  height: 48px;
+  border: 6px solid ${COLORS.gold}44;
+  border-top-color: ${COLORS.gold};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  @keyframes spin { to { transform: rotate(360deg); } }
+`;
+
 const ScannerOverlay = styled.div`
   position: absolute;
   top: 50%;
@@ -168,6 +202,21 @@ function QrChallenge() {
   })
   const [mode, setMode] = useState('show') // 'show' | 'scan'
   const [isScanning, setIsScanning] = useState(false)
+  const [error, setError] = useState('')
+  const [isLoadingScanner, setIsLoadingScanner] = useState(false)
+  const videoRef = useRef(null)
+  const scannerRef = useRef(null)
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.stop()
+        scannerRef.current = null
+      }
+      stopMediaTracks()
+    }
+  }, [])
 
   const handleNewChallenge = () => {
     const randomIndex = Math.floor(Math.random() * challenges.length)
@@ -175,44 +224,95 @@ function QrChallenge() {
     setMode('show')
   }
 
-  const handleStartScanning = async () => {
-    setMode('scan')
-    setIsScanning(true)
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      })
-      
-      const video = document.getElementById('qr-video')
-      if (video) {
-        video.srcObject = stream
-        video.play()
-      }
-
-      // Simple QR detection simulation
-      // In a real implementation, you'd use qr-scanner library here
-      setTimeout(() => {
-        alert('¡QR escaneado! Por favor, acepta el reto.')
-        handleStopScanning()
-        handleNewChallenge()
-      }, 3000)
-    } catch (error) {
-      console.error('Camera access denied:', error)
-      alert('No se pudo acceder a la cámara. Por favor verifica los permisos.')
-      setIsScanning(false)
-      setMode('show')
-    }
-  }
-
-  const handleStopScanning = () => {
-    const video = document.getElementById('qr-video')
+  const stopMediaTracks = () => {
+    const video = videoRef.current
     if (video && video.srcObject) {
       const stream = video.srcObject
       const tracks = stream.getTracks()
       tracks.forEach(track => track.stop())
       video.srcObject = null
     }
+  }
+
+  const handleStartScanning = async () => {
+    setError('')
+    setMode('scan')
+    setIsScanning(true)
+    setIsLoadingScanner(true)
+
+    // Secure context check (required for camera on mobile browsers)
+    if (!window.isSecureContext) {
+      setError('El acceso a la cámara requiere HTTPS o localhost. Usa una conexión segura (por ejemplo: https://) o un túnel como ngrok.')
+      setIsScanning(false)
+      setIsLoadingScanner(false)
+      return
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError('Tu navegador no soporta acceso a la cámara.')
+      setIsScanning(false)
+      setIsLoadingScanner(false)
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }
+      })
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play()
+        }
+      }
+
+      // Dynamically import qr-scanner to avoid SSR issues
+      const { default: QrScanner } = await import('qr-scanner')
+      scannerRef.current = new QrScanner(
+        videoRef.current,
+        result => {
+          if (!result?.data) return
+          try {
+            const parsed = JSON.parse(result.data)
+            if (parsed.type === 'ego-challenge' && parsed.challengeId) {
+              const matched = challenges.find(c => c.id === parsed.challengeId)
+              if (matched) {
+                setCurrentChallenge(matched)
+              } else {
+                setCurrentChallenge({ id: 999, emoji: '❓', text: parsed.challenge || 'Reto desconocido' })
+              }
+              handleStopScanning()
+            } else {
+              setError('QR leído pero no es un reto válido.')
+            }
+          } catch (e) {
+            setError('Formato de QR no reconocido.')
+          }
+        },
+        {
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          maxScansPerSecond: 4
+        }
+      )
+      await scannerRef.current.start()
+    } catch (err) {
+      console.error(err)
+      setError('No se pudo acceder a la cámara o iniciar el escáner.')
+      setIsScanning(false)
+      setMode('show')
+      stopMediaTracks()
+    } finally {
+      setIsLoadingScanner(false)
+    }
+  }
+
+  const handleStopScanning = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop()
+      scannerRef.current = null
+    }
+    stopMediaTracks()
     setIsScanning(false)
     setMode('show')
   }
@@ -267,13 +367,23 @@ function QrChallenge() {
         ) : (
           <>
             <ScannerContainer>
-              <VideoElement id="qr-video" playsInline />
+              <VideoElement ref={videoRef} playsInline muted />
               <ScannerOverlay />
+              {isLoadingScanner && (
+                <LoadingOverlay>
+                  <div style={{ display: 'grid', gap: '12px', placeItems: 'center' }}>
+                    <Spinner />
+                    <div>Iniciando cámara…</div>
+                  </div>
+                </LoadingOverlay>
+              )}
             </ScannerContainer>
-
-            <InfoBox>
-              📷 Apunta la cámara al código QR para escanearlo
-            </InfoBox>
+            {!error && (
+              <InfoBox>
+                {isLoadingScanner ? 'Preparando escáner…' : '📷 Apunta la cámara al código QR para escanearlo'}
+              </InfoBox>
+            )}
+            {error && <ErrorBox>{error}</ErrorBox>}
 
             <Button variant="outline" onClick={handleStopScanning}>
               ✕ Cancelar
