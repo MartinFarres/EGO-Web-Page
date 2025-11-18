@@ -180,32 +180,28 @@ const ScannerOverlay = styled.div`
   }
 `;
 
-const challenges = [
-  { id: 1, emoji: '🎤', text: 'Canta una canción durante 30 segundos' },
-  { id: 2, emoji: '🕺', text: 'Baila tu mejor paso de baile' },
-  { id: 3, emoji: '🤡', text: 'Haz reír a alguien sin tocarle' },
-  { id: 4, emoji: '🎭', text: 'Actúa como un animal durante 1 minuto' },
-  { id: 5, emoji: '📱', text: 'Envía un mensaje de voz a un amigo con una voz rara' },
-  { id: 6, emoji: '🧘', text: 'Mantén una pose de yoga por 30 segundos' },
-  { id: 7, emoji: '🎨', text: 'Dibuja un autorretrato en 60 segundos' },
-  { id: 8, emoji: '🗣️', text: 'Di un trabalenguas 3 veces seguidas' },
-  { id: 9, emoji: '👻', text: 'Asusta a alguien del evento' },
-  { id: 10, emoji: '🎯', text: 'Haz 10 cumplidos a personas diferentes' },
-  { id: 11, emoji: '🤝', text: 'Presenta a dos personas que no se conocen' },
-  { id: 12, emoji: '📸', text: 'Toma una selfie grupal con 5 desconocidos' },
+// QR Hunt definitions (3 hidden codes in the event)
+const HUNT_CODES = [
+  { codeId: 'EGO-1', label: 'Código 1', prize: 'Shot gratis en la barra' },
+  { codeId: 'EGO-2', label: 'Código 2', prize: 'Sticker pack EGO' },
+  { codeId: 'EGO-3', label: 'Código 3', prize: 'Foto Polaroid VIP' },
 ]
 
 function QrChallenge() {
-  const [currentChallenge, setCurrentChallenge] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * challenges.length)
-    return challenges[randomIndex]
-  })
-  const [mode, setMode] = useState('show') // 'show' | 'scan'
-  const [qrFormat, setQrFormat] = useState('json') // 'json' | 'link'
+  const [mode, setMode] = useState('intro') // 'intro' | 'scan' | 'found'
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState('')
   const [scanInfo, setScanInfo] = useState('')
   const [isLoadingScanner, setIsLoadingScanner] = useState(false)
+  const [found, setFound] = useState(null) // { codeId, prize }
+  const [progress, setProgress] = useState(() => {
+    try {
+      const raw = localStorage.getItem('ego-hunt-found')
+      return raw ? JSON.parse(raw) : []
+    } catch {
+      return []
+    }
+  })
   const videoRef = useRef(null)
   const scannerRef = useRef(null)
 
@@ -220,10 +216,13 @@ function QrChallenge() {
     }
   }, [])
 
-  const handleNewChallenge = () => {
-    const randomIndex = Math.floor(Math.random() * challenges.length)
-    setCurrentChallenge(challenges[randomIndex])
-    setMode('show')
+  const addProgress = codeId => {
+    setProgress(prev => {
+      if (prev.includes(codeId)) return prev
+      const next = [...prev, codeId]
+      try { localStorage.setItem('ego-hunt-found', JSON.stringify(next)) } catch {}
+      return next
+    })
   }
 
   const stopMediaTracks = () => {
@@ -239,7 +238,7 @@ function QrChallenge() {
   const handleStartScanning = async () => {
     setError('')
     setScanInfo('')
-    setMode('scan')
+  setMode('scan')
     setIsScanning(true)
     setIsLoadingScanner(true)
 
@@ -291,38 +290,39 @@ function QrChallenge() {
           if (!result) return
           const raw = result.data || result // Support detailed or plain result
           if (!raw) return
-          // Try JSON first
-          let parsed
+          // Accept JSON or URL. Preferred JSON payload:
+          // { type: 'ego-hunt', codeId: 'EGO-1' }
+          let payload = null
           try {
-            parsed = JSON.parse(raw)
-          } catch (e) {
-            // Maybe it's a link form
-            if (/ego-web-page/.test(raw)) {
+            payload = JSON.parse(raw)
+          } catch (_) {
+            // Link fallback: https://.../game/qr-challenge?type=ego-hunt&codeId=EGO-1
+            try {
               const urlObj = new URL(raw)
-              const idParam = urlObj.searchParams.get('challengeId')
-              if (idParam) {
-                const matched = challenges.find(c => c.id === Number(idParam))
-                if (matched) {
-                  setCurrentChallenge(matched)
-                  handleStopScanning()
-                  return
-                }
+              const type = urlObj.searchParams.get('type')
+              const codeId = urlObj.searchParams.get('codeId')
+              if (type === 'ego-hunt' && codeId) {
+                payload = { type, codeId }
               }
-            }
-            setScanInfo('QR detectado pero no coincide con formato esperado.')
+            } catch {}
+          }
+
+          if (!payload || payload.type !== 'ego-hunt' || !payload.codeId) {
+            setScanInfo('QR detectado, pero no es de la cacería EGO.')
             return
           }
-          if (parsed?.type === 'ego-challenge' && parsed.challengeId) {
-            const matched = challenges.find(c => c.id === parsed.challengeId)
-            if (matched) {
-              setCurrentChallenge(matched)
-            } else {
-              setCurrentChallenge({ id: 999, emoji: '❓', text: parsed.challenge || 'Reto desconocido' })
-            }
-            handleStopScanning()
-          } else {
-            setScanInfo('QR leído pero no es un reto válido.')
+
+          const match = HUNT_CODES.find(c => c.codeId === payload.codeId)
+          if (!match) {
+            setScanInfo('Código no válido para este evento.')
+            return
           }
+
+          // Mark as found and stop scanning
+          addProgress(match.codeId)
+          setFound({ codeId: match.codeId, prize: match.prize })
+          handleStopScanning()
+          setMode('found')
         },
         {
           returnDetailedScanResult: true,
@@ -351,62 +351,63 @@ function QrChallenge() {
     }
     stopMediaTracks()
     setIsScanning(false)
-    setMode('show')
+    // don't change mode here; caller will decide
   }
 
-  const qrData = qrFormat === 'json'
-    ? JSON.stringify({
-        type: 'ego-challenge',
-        challengeId: currentChallenge.id,
-        challenge: currentChallenge.text
-      })
-    : `${window.location.origin}/EGO-Web-Page/game/qr-challenge?challengeId=${currentChallenge.id}`
+  // Admin mode to print the 3 QR codes
+  const params = new URLSearchParams(window.location.search)
+  const isAdmin = params.get('admin') === '1'
+  const adminCodes = HUNT_CODES.map(c => ({
+    ...c,
+    value: JSON.stringify({ type: 'ego-hunt', codeId: c.codeId })
+  }))
 
   return (
     <Wrap>
       <StyledPanel $delay="0.2s">
         <div>
-          <Title>📱 QR Challenge</Title>
-          <Description>
-            {mode === 'show' 
-              ? 'Muestra este código QR a otra persona para que lo escanee y acepte tu reto'
-              : 'Escanea el código QR de otra persona para ver su desafío'}
-          </Description>
+          {isAdmin ? (
+            <>
+              <Title>�️ Admin: QR Hunt</Title>
+              <Description>Imprime estos 3 códigos y escóndelos en el evento. Quien los encuentre debe regresarlos al staff para canjear el premio.</Description>
+            </>
+          ) : (
+            <>
+              <Title>🔎 QR Hunt</Title>
+              <Description>
+                Encuentra los 3 códigos QR escondidos en el evento. Al escanear uno, verás tu premio. Para canjearlo, entrega el QR físico al staff.
+              </Description>
+            </>
+          )}
         </div>
 
-        {mode === 'show' ? (
+        {isAdmin ? (
+          <>
+            {adminCodes.map(code => (
+              <ChallengeCard key={code.codeId}>
+                <ChallengeEmoji>🏷️ {code.label}</ChallengeEmoji>
+                <ChallengeText style={{ marginBottom: 16 }}>Premio: {code.prize}</ChallengeText>
+                <QrContainer>
+                  <QRCode value={code.value} size={220} level="H" includeMargin={true} />
+                </QrContainer>
+                <InfoBox>Payload: {JSON.stringify({ type: 'ego-hunt', codeId: code.codeId })}</InfoBox>
+              </ChallengeCard>
+            ))}
+            <Button variant="secondary" onClick={() => window.print()}>🖨️ Imprimir</Button>
+          </>
+        ) : mode === 'intro' ? (
           <>
             <ChallengeCard>
-              <ChallengeEmoji>{currentChallenge.emoji}</ChallengeEmoji>
-              <ChallengeText>{currentChallenge.text}</ChallengeText>
+              <ChallengeEmoji>🎯</ChallengeEmoji>
+              <ChallengeText>
+                Progreso: {progress.length}/3 encontrados
+              </ChallengeText>
             </ChallengeCard>
-
-            <QrContainer>
-              <QRCode 
-                value={qrData}
-                size={200}
-                level="H"
-                includeMargin={true}
-              />
-            </QrContainer>
-
-            <InfoBox>
-              💡 Otra persona puede escanear este código para ver tu desafío
-            </InfoBox>
-
             <ButtonGroup>
-              <Button variant="primary" onClick={handleNewChallenge}>
-                🎲 Nuevo Reto
-              </Button>
-              <Button variant="secondary" onClick={handleStartScanning}>
-                📷 Escanear QR
-              </Button>
-              <Button variant="outline" onClick={() => setQrFormat(f => f === 'json' ? 'link' : 'json')}>
-                {qrFormat === 'json' ? '🔗 Modo Link' : '🧱 Modo JSON'}
-              </Button>
+              <Button variant="secondary" onClick={handleStartScanning}>📷 Empezar a escanear</Button>
             </ButtonGroup>
           </>
-        ) : (
+        ) : mode === 'scan' ? (
           <>
             <ScannerContainer>
               <VideoElement ref={videoRef} playsInline muted />
@@ -422,14 +423,35 @@ function QrChallenge() {
             </ScannerContainer>
             {!error && (
               <InfoBox>
-                {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '📷 Apunta la cámara al código QR para escanearlo'}
+                {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '📷 Apunta la cámara a un QR de la cacería'}
               </InfoBox>
             )}
             {error && <ErrorBox>{error}</ErrorBox>}
 
-            <Button variant="outline" onClick={handleStopScanning}>
-              ✕ Cancelar
-            </Button>
+            <Button variant="outline" onClick={() => { handleStopScanning(); setMode('intro') }}>✕ Cancelar</Button>
+          </>
+        ) : (
+          <>
+            <ChallengeCard>
+              <ChallengeEmoji>🎉</ChallengeEmoji>
+              <ChallengeText>
+                ¡Código encontrado!
+                <br />
+                <strong>{found?.codeId}</strong>
+                <br />
+                Premio: {found?.prize}
+              </ChallengeText>
+            </ChallengeCard>
+            <InfoBox>
+              Para canjear tu premio, entrega el QR físico al staff del evento.
+              {found && progress.filter(id => id === found.codeId).length > 0 && (
+                <div style={{ marginTop: 8 }}>Este código ya quedó registrado en tu progreso.</div>
+              )}
+              <div style={{ marginTop: 8 }}>Progreso: {progress.length}/3</div>
+            </InfoBox>
+            <ButtonGroup>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Buscar otro QR</Button>
+            </ButtonGroup>
           </>
         )}
       </StyledPanel>
