@@ -259,7 +259,12 @@ function QrChallenge() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } }
+        video: {
+          facingMode: { ideal: 'environment' },
+          // Mejores resultados de lectura con más resolución
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
       })
       if (videoRef.current) {
         videoRef.current.srcObject = stream
@@ -277,11 +282,15 @@ function QrChallenge() {
       // Dynamically import qr-scanner and set worker path for Vite
       const qrModule = await import('qr-scanner')
       const QrScanner = qrModule.default
-      // Attempt to set worker path (Vite will fingerprint the asset)
+      // Use Vite's ?url to get a proper URL to the worker asset
       try {
-        QrScanner.WORKER_PATH = qrModule.WORKER_PATH || new URL('qr-scanner/qr-scanner-worker.min.js', import.meta.url).toString()
+        const workerURL = (await import('qr-scanner/qr-scanner-worker.min.js?url')).default
+        QrScanner.WORKER_PATH = workerURL
       } catch (_) {
-        // Fallback: rely on internal worker if available
+        // Fallback: relative URL (may work depending on bundler)
+        try {
+          QrScanner.WORKER_PATH = new URL('qr-scanner-worker.min.js', import.meta.url).toString()
+        } catch {}
       }
 
       scannerRef.current = new QrScanner(
@@ -335,9 +344,10 @@ function QrChallenge() {
       setScanInfo('Buscando código…')
     } catch (err) {
       console.error(err)
-      setError('No se pudo acceder a la cámara o iniciar el escáner.')
+      const maybeWorker = /Worker|script at|cannot be accessed|Failed to construct/i.test(String(err?.message || err))
+      setError('No se pudo acceder a la cámara o iniciar el escáner.' + (maybeWorker ? ' Posible causa: el worker del lector no se está cargando. Intenta nuevamente; ya ajusté la ruta del worker para Vite.' : ''))
       setIsScanning(false)
-      setMode('show')
+      setMode('intro')
       stopMediaTracks()
     } finally {
       setIsLoadingScanner(false)
