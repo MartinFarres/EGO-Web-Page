@@ -244,6 +244,26 @@ const Spinner = styled.div`
   @keyframes spin { to { transform: rotate(360deg); } }
 `;
 
+const scannerPulse = keyframes`
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 ${COLORS.vitalYellow}66, 0 0 0 9999px ${COLORS.black}88;
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 0 8px ${COLORS.vitalYellow}00, 0 0 0 9999px ${COLORS.black}88;
+  }
+`;
+
+const scanLine = keyframes`
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+`;
+
 const ScannerOverlay = styled.div`
   position: absolute;
   top: 50%;
@@ -255,6 +275,7 @@ const ScannerOverlay = styled.div`
   border-radius: 16px;
   box-shadow: 0 0 0 9999px ${COLORS.black}88;
   pointer-events: none;
+  animation: ${scannerPulse} 2s ease-in-out infinite;
   
   &::before, &::after {
     content: '';
@@ -277,6 +298,16 @@ const ScannerOverlay = styled.div`
     border-left: none;
     border-top: none;
   }
+`;
+
+const ScanLine = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, ${COLORS.vitalYellow}, transparent);
+  animation: ${scanLine} 2s linear infinite;
 `;
 
 const SuccessCard = styled(ChallengeCard)`
@@ -525,31 +556,36 @@ function QrChallenge() {
         // Check if it's a real prize code
         const realMatch = HUNT_CODES.find(c => c.codeId === payload.codeId)
         if (realMatch) {
-          handleStopScanning()
-          // Add a small delay for better UX
+          // Provide immediate visual feedback
+          addProgress(realMatch.codeId)
+          setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
+          
+          // Check if this completes the hunt
+          const currentProgress = JSON.parse(localStorage.getItem('ego-hunt-found') || '[]')
+          if (currentProgress.length >= 3) {
+            setMode('completed')
+          } else {
+            setMode('found')
+          }
+          
+          // Cleanup scanner after state updates
           setTimeout(() => {
-            addProgress(realMatch.codeId)
-            setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
-            // Check if this completes the hunt (will be 3 after addProgress updates state)
-            const currentProgress = JSON.parse(localStorage.getItem('ego-hunt-found') || '[]')
-            if (currentProgress.length >= 3) {
-              setMode('completed')
-            } else {
-              setMode('found')
-            }
-          }, 500)
+            handleStopScanning()
+          }, 150)
           return
         }
         
         // Check if it's a fake code
         const fakeMatch = FAKE_CODES.find(c => c.codeId === payload.codeId)
         if (fakeMatch) {
-          handleStopScanning()
-          // Add a small delay for better UX
+          // Provide immediate visual feedback
+          setFound({ codeId: fakeMatch.codeId, message: fakeMatch.message })
+          setMode('found-fake')
+          
+          // Cleanup scanner after state updates
           setTimeout(() => {
-            setFound({ codeId: fakeMatch.codeId, message: fakeMatch.message })
-            setMode('found-fake')
-          }, 500)
+            handleStopScanning()
+          }, 150)
           return
         }
         
@@ -562,7 +598,18 @@ function QrChallenge() {
         returnDetailedScanResult: true,
         highlightScanRegion: true,
         highlightCodeOutline: true,
-        maxScansPerSecond: 5
+        maxScansPerSecond: 10, // Increased for faster detection
+        calculateScanRegion: (video) => {
+          // Optimize scan region for better performance
+          const smallestDimension = Math.min(video.videoWidth, video.videoHeight)
+          const scanRegionSize = Math.round(0.6 * smallestDimension)
+          return {
+            x: Math.round((video.videoWidth - scanRegionSize) / 2),
+            y: Math.round((video.videoHeight - scanRegionSize) / 2),
+            width: scanRegionSize,
+            height: scanRegionSize,
+          }
+        }
       })
       setScanInfo('Escaneando…')
       await scannerRef.current.start()
@@ -679,7 +726,9 @@ function QrChallenge() {
           <>
             <ScannerContainer>
               <VideoElement ref={videoRef} playsInline muted />
-              <ScannerOverlay />
+              <ScannerOverlay>
+                <ScanLine />
+              </ScannerOverlay>
               {isLoadingScanner && (
                 <LoadingOverlay>
                   <div style={{ display: 'grid', gap: '12px', placeItems: 'center' }}>

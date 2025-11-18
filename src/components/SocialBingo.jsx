@@ -248,6 +248,26 @@ const VideoElement = styled.video`
   object-fit: cover;
 `;
 
+const scannerPulse = keyframes`
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 ${COLORS.vitalYellow}66;
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 10px ${COLORS.vitalYellow}00;
+  }
+`;
+
+const scanLine = keyframes`
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+`;
+
 const ScannerOverlay = styled.div`
   position: absolute;
   top: 50%;
@@ -259,6 +279,7 @@ const ScannerOverlay = styled.div`
   border-radius: 12px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
   pointer-events: none;
+  animation: ${scannerPulse} 2s ease-in-out infinite;
   
   &::before, &::after {
     content: '';
@@ -281,6 +302,16 @@ const ScannerOverlay = styled.div`
     border-left: none;
     border-top: none;
   }
+`;
+
+const ScanLine = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, ${COLORS.vitalYellow}, transparent);
+  animation: ${scanLine} 2s linear infinite;
 `;
 
 const LoadingSpinner = styled.div`
@@ -667,38 +698,49 @@ function SocialBingo() {
           return
         }
         
-        // Valid QR scanned! Add a small delay for better UX
-        handleStopScanning()
-        
-        setTimeout(() => {
-          if (selectedTask) {
-            setTasks(prev => prev.map(t => 
-              t.id === selectedTask.id 
-                ? { ...t, completed: true }
-                : t
-            ))
-            
-            // Show success animation
-            setCompletedTask(selectedTask)
-            setShowSuccess(true)
-            
-            // Auto-hide success message after 3 seconds
-            setTimeout(() => {
-              setShowSuccess(false)
-              setCompletedTask(null)
-            }, 3000)
-          }
+        // Valid QR scanned! Provide immediate feedback
+        if (selectedTask) {
+          setTasks(prev => prev.map(t => 
+            t.id === selectedTask.id 
+              ? { ...t, completed: true }
+              : t
+          ))
           
-          setShowConfirmModal(false)
-          setSelectedTask(null)
-        }, 500)
+          // Show success animation immediately
+          setCompletedTask(selectedTask)
+          setShowSuccess(true)
+          
+          // Close modal and cleanup scanner after showing success
+          setTimeout(() => {
+            setShowConfirmModal(false)
+            setSelectedTask(null)
+            handleStopScanning()
+          }, 200)
+          
+          // Auto-hide success message after 3 seconds
+          setTimeout(() => {
+            setShowSuccess(false)
+            setCompletedTask(null)
+          }, 3000)
+        }
       }
 
       scannerRef.current = new QrScanner(videoRef.current, handleResult, {
         returnDetailedScanResult: true,
         highlightScanRegion: true,
         highlightCodeOutline: true,
-        maxScansPerSecond: 5
+        maxScansPerSecond: 10, // Increased for faster detection
+        calculateScanRegion: (video) => {
+          // Optimize scan region for better performance
+          const smallestDimension = Math.min(video.videoWidth, video.videoHeight)
+          const scanRegionSize = Math.round(0.6 * smallestDimension)
+          return {
+            x: Math.round((video.videoWidth - scanRegionSize) / 2),
+            y: Math.round((video.videoHeight - scanRegionSize) / 2),
+            width: scanRegionSize,
+            height: scanRegionSize,
+          }
+        }
       })
       
       await scannerRef.current.start()
@@ -893,7 +935,9 @@ function SocialBingo() {
               <>
                 <ScannerContainer>
                   <VideoElement ref={videoRef} playsInline muted />
-                  <ScannerOverlay />
+                  <ScannerOverlay>
+                    <ScanLine />
+                  </ScannerOverlay>
                 </ScannerContainer>
 
                 {isScanning && !scanError && (

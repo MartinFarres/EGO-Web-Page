@@ -192,7 +192,7 @@ function GameMenu() {
           </div>
         </Card>
         <Card to="/game/trago-del-destino" $delay={0.5} aria-label="Ir a Tu Trago del Destino">
-          <IconWrapper>🍹✨</IconWrapper>
+          <IconWrapper>🍹</IconWrapper>
           <div>
             <CardTitle>Tu Trago del Destino</CardTitle>
             <CardDescription>Descubre tu desafío zodiacal</CardDescription>
@@ -206,7 +206,7 @@ function GameMenu() {
           </div>
         </Card>
         <Card to="/game/qr-challenge" $delay={0.7} aria-label="Ir a Treasure Hunt">
-          <IconWrapper>🏴‍☠️�</IconWrapper>
+          <IconWrapper>🏴‍☠️</IconWrapper>
           <div>
             <CardTitle>Treasure Hunt</CardTitle>
             <CardDescription>Encuentra los tesoros escondidos</CardDescription>
