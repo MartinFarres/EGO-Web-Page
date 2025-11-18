@@ -57,6 +57,29 @@ const confettiFall = keyframes`
   }
 `
 
+const shakeWiggle = keyframes`
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10px) rotate(5deg);
+  }
+`
+
+const sadPulse = keyframes`
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+`
+
 const Wrap = styled(Container)`
   padding: 24px 16px;
   min-height: calc(100vh - 80px);
@@ -267,6 +290,24 @@ const Confetti = styled.div`
   opacity: 0.9;
 `;
 
+const FakeCard = styled(ChallengeCard)`
+  animation: ${shakeWiggle} 0.6s ease-in-out;
+  background: linear-gradient(145deg, #2a1a1a, #3a2020);
+  border: 2px solid #ff555588;
+`;
+
+const FakeEmoji = styled(ChallengeEmoji)`
+  animation: ${sadPulse} 1.5s ease-in-out infinite;
+`;
+
+const FakeMessage = styled.div`
+  color: #ffdddd;
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 500;
+  margin-top: 12px;
+`;
+
 // QR Hunt definitions (3 hidden codes in the event)
 const HUNT_CODES = [
   { codeId: 'EGO-1', label: 'Código 1', prize: 'Shot gratis en la barra' },
@@ -274,13 +315,20 @@ const HUNT_CODES = [
   { codeId: 'EGO-3', label: 'Código 3', prize: 'Foto Polaroid VIP' },
 ]
 
+// Fake QR codes (3 decoys with no prizes)
+const FAKE_CODES = [
+  { codeId: 'FAKE-1', label: 'Código Falso 1', message: '¡Casi! Este es un señuelo 😜' },
+  { codeId: 'FAKE-2', label: 'Código Falso 2', message: '¡Upss! Inténtalo de nuevo 🎭' },
+  { codeId: 'FAKE-3', label: 'Código Falso 3', message: '¡Trampa! Sigue buscando 🕵️' },
+]
+
 function QrChallenge() {
-  const [mode, setMode] = useState('intro') // 'intro' | 'scan' | 'found'
+  const [mode, setMode] = useState('intro') // 'intro' | 'scan' | 'found' | 'found-fake'
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState('')
   const [scanInfo, setScanInfo] = useState('')
   const [isLoadingScanner, setIsLoadingScanner] = useState(false)
-  const [found, setFound] = useState(null) // { codeId, prize }
+  const [found, setFound] = useState(null) // { codeId, prize } or { codeId, message }
   const [attempts, setAttempts] = useState(0)
   const [progress, setProgress] = useState(() => {
     try {
@@ -389,15 +437,29 @@ function QrChallenge() {
           setScanInfo('QR detectado, pero no es de la cacería EGO.')
           return
         }
-        const match = HUNT_CODES.find(c => c.codeId === payload.codeId)
-        if (!match) {
-          setScanInfo('Código no válido para este evento.')
+        
+        // Check if it's a real prize code
+        const realMatch = HUNT_CODES.find(c => c.codeId === payload.codeId)
+        if (realMatch) {
+          addProgress(realMatch.codeId)
+          setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
+          handleStopScanning()
+          setMode('found')
           return
         }
-        addProgress(match.codeId)
-        setFound({ codeId: match.codeId, prize: match.prize })
-        handleStopScanning()
-        setMode('found')
+        
+        // Check if it's a fake code
+        const fakeMatch = FAKE_CODES.find(c => c.codeId === payload.codeId)
+        if (fakeMatch) {
+          setFound({ codeId: fakeMatch.codeId, message: fakeMatch.message })
+          handleStopScanning()
+          setMode('found-fake')
+          return
+        }
+        
+        // Unknown code
+        setScanInfo('Código no válido para este evento.')
+        return
       }
 
       scannerRef.current = new QrScanner(videoRef.current, handleResult, {
@@ -449,13 +511,20 @@ function QrChallenge() {
     // don't change mode here; caller will decide
   }
 
-  // Admin mode to print the 3 QR codes
+  // Admin mode to print the QR codes (real + fake)
   const params = new URLSearchParams(window.location.search)
   const isAdmin = params.get('admin') === '1'
   const adminCodes = HUNT_CODES.map(c => ({
     ...c,
-    value: JSON.stringify({ type: 'ego-hunt', codeId: c.codeId })
+    value: JSON.stringify({ type: 'ego-hunt', codeId: c.codeId }),
+    isFake: false
   }))
+  const adminFakeCodes = FAKE_CODES.map(c => ({
+    ...c,
+    value: JSON.stringify({ type: 'ego-hunt', codeId: c.codeId }),
+    isFake: true
+  }))
+  const allAdminCodes = [...adminCodes, ...adminFakeCodes]
 
   return (
     <Wrap>
@@ -478,10 +547,12 @@ function QrChallenge() {
 
         {isAdmin ? (
           <>
-            {adminCodes.map(code => (
-              <ChallengeCard key={code.codeId}>
-                <ChallengeEmoji>🏷️ {code.label}</ChallengeEmoji>
-                <ChallengeText style={{ marginBottom: 16 }}>Premio: {code.prize}</ChallengeText>
+            {allAdminCodes.map(code => (
+              <ChallengeCard key={code.codeId} style={{ background: code.isFake ? 'linear-gradient(145deg, #2a1a1a, #3a2020)' : undefined, borderColor: code.isFake ? '#ff555588' : undefined }}>
+                <ChallengeEmoji>{code.isFake ? '�' : '�🏷️'} {code.label}</ChallengeEmoji>
+                <ChallengeText style={{ marginBottom: 16 }}>
+                  {code.isFake ? `Señuelo: ${code.message}` : `Premio: ${code.prize}`}
+                </ChallengeText>
                 <QrContainer>
                   <QRCode value={code.value} size={220} level="H" includeMargin={true} />
                 </QrContainer>
@@ -530,7 +601,7 @@ function QrChallenge() {
 
             <Button variant="outline" onClick={() => { handleStopScanning(); setMode('intro') }}>✕ Cancelar</Button>
           </>
-        ) : (
+        ) : mode === 'found' ? (
           <>
             <ConfettiContainer>
               {Array.from({ length: 50 }).map((_, i) => (
@@ -562,6 +633,26 @@ function QrChallenge() {
             </InfoBox>
             <ButtonGroup>
               <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Buscar otro QR</Button>
+            </ButtonGroup>
+          </>
+        ) : (
+          <>
+            <FakeCard>
+              <FakeEmoji>😅</FakeEmoji>
+              <FakeMessage>
+                {found?.message || '¡Casi! Este es un señuelo'}
+                <br />
+                <div style={{ fontSize: 14, opacity: 0.8, marginTop: 8 }}>
+                  Código: {found?.codeId}
+                </div>
+              </FakeMessage>
+            </FakeCard>
+            <InfoBox style={{ background: '#3a202022', borderColor: '#ff555544' }}>
+              Este código no tiene premio, ¡pero sigue buscando! Los códigos reales están escondidos en el evento.
+              <div style={{ marginTop: 8 }}>Progreso real: {progress.length}/3</div>
+            </InfoBox>
+            <ButtonGroup>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Seguir buscando</Button>
             </ButtonGroup>
           </>
         )}
