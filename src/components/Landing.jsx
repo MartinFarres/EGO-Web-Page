@@ -98,16 +98,16 @@ const LogoWrapper = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 200px;
-  height: 200px;
+  width: 280px;
+  height: 280px;
   object-fit: contain;
   opacity: 0.95;
   filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   
   @media (max-width: 480px) {
-    width: 160px;
-    height: 160px;
+    width: 220px;
+    height: 220px;
   }
 
   @media (hover: hover) {
