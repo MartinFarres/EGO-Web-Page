@@ -4,6 +4,10 @@ import { COLORS } from '../colors.js'
 import { Button } from './ui/Button.jsx'
 import { Panel, Container } from './ui/Card.jsx'
 import QRCode from 'react-qr-code'
+// Static imports for qr-scanner to ensure worker path is registered before usage
+import QrScanner from 'qr-scanner'
+import qrScannerWorkerPath from 'qr-scanner/qr-scanner-worker.min.js?url'
+QrScanner.WORKER_PATH = qrScannerWorkerPath
 
 const fadeIn = keyframes`
   from {
@@ -194,6 +198,7 @@ function QrChallenge() {
   const [scanInfo, setScanInfo] = useState('')
   const [isLoadingScanner, setIsLoadingScanner] = useState(false)
   const [found, setFound] = useState(null) // { codeId, prize }
+  const [attempts, setAttempts] = useState(0)
   const [progress, setProgress] = useState(() => {
     try {
       const raw = localStorage.getItem('ego-hunt-found')
@@ -204,6 +209,8 @@ function QrChallenge() {
   })
   const videoRef = useRef(null)
   const scannerRef = useRef(null)
+  const manualFallbackTimeoutRef = useRef(null)
+  const debug = new URLSearchParams(window.location.search).get('debug') === '1'
 
   // Cleanup on unmount
   useEffect(() => {
@@ -238,9 +245,10 @@ function QrChallenge() {
   const handleStartScanning = async () => {
     setError('')
     setScanInfo('')
-  setMode('scan')
+    setMode('scan')
     setIsScanning(true)
     setIsLoadingScanner(true)
+    setAttempts(0)
 
     // Secure context check (required for camera on mobile browsers)
     if (!window.isSecureContext) {
@@ -260,8 +268,7 @@ function QrChallenge() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { ideal: 'environment' },
-          // Mejores resultados de lectura con más resolución
+          facingMode: 'environment', // simpler facingMode improves compatibility on iOS
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
@@ -279,69 +286,60 @@ function QrChallenge() {
         }
       })
 
-      // Dynamically import qr-scanner and set worker path for Vite
-      const qrModule = await import('qr-scanner')
-      const QrScanner = qrModule.default
-      // Use Vite's ?url to get a proper URL to the worker asset
-      try {
-        const workerURL = (await import('qr-scanner/qr-scanner-worker.min.js?url')).default
-        QrScanner.WORKER_PATH = workerURL
-      } catch (_) {
-        // Fallback: relative URL (may work depending on bundler)
+      const handleResult = rawResult => {
+        if (!rawResult) return
+        setAttempts(a => a + 1)
+        const raw = rawResult.data || rawResult
+        if (!raw) return
+        let payload = null
         try {
-          QrScanner.WORKER_PATH = new URL('qr-scanner-worker.min.js', import.meta.url).toString()
-        } catch {}
+          payload = JSON.parse(raw)
+        } catch (_) {
+          try {
+            const urlObj = new URL(raw)
+            const type = urlObj.searchParams.get('type')
+            const codeId = urlObj.searchParams.get('codeId')
+            if (type === 'ego-hunt' && codeId) payload = { type, codeId }
+          } catch {}
+        }
+        if (!payload || payload.type !== 'ego-hunt' || !payload.codeId) {
+          setScanInfo('QR detectado, pero no es de la cacería EGO.')
+          return
+        }
+        const match = HUNT_CODES.find(c => c.codeId === payload.codeId)
+        if (!match) {
+          setScanInfo('Código no válido para este evento.')
+          return
+        }
+        addProgress(match.codeId)
+        setFound({ codeId: match.codeId, prize: match.prize })
+        handleStopScanning()
+        setMode('found')
       }
 
-      scannerRef.current = new QrScanner(
-        videoRef.current,
-        result => {
-          if (!result) return
-          const raw = result.data || result // Support detailed or plain result
-          if (!raw) return
-          // Accept JSON or URL. Preferred JSON payload:
-          // { type: 'ego-hunt', codeId: 'EGO-1' }
-          let payload = null
-          try {
-            payload = JSON.parse(raw)
-          } catch (_) {
-            // Link fallback: https://.../game/qr-challenge?type=ego-hunt&codeId=EGO-1
-            try {
-              const urlObj = new URL(raw)
-              const type = urlObj.searchParams.get('type')
-              const codeId = urlObj.searchParams.get('codeId')
-              if (type === 'ego-hunt' && codeId) {
-                payload = { type, codeId }
-              }
-            } catch {}
-          }
-
-          if (!payload || payload.type !== 'ego-hunt' || !payload.codeId) {
-            setScanInfo('QR detectado, pero no es de la cacería EGO.')
-            return
-          }
-
-          const match = HUNT_CODES.find(c => c.codeId === payload.codeId)
-          if (!match) {
-            setScanInfo('Código no válido para este evento.')
-            return
-          }
-
-          // Mark as found and stop scanning
-          addProgress(match.codeId)
-          setFound({ codeId: match.codeId, prize: match.prize })
-          handleStopScanning()
-          setMode('found')
-        },
-        {
-          returnDetailedScanResult: true,
-          highlightScanRegion: true,
-          maxScansPerSecond: 4
-        }
-      )
+      scannerRef.current = new QrScanner(videoRef.current, handleResult, {
+        returnDetailedScanResult: true,
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        maxScansPerSecond: 5
+      })
       setScanInfo('Escaneando…')
       await scannerRef.current.start()
       setScanInfo('Buscando código…')
+
+      // Manual fallback: after 8s try one still-frame decode if nothing found
+      manualFallbackTimeoutRef.current = setTimeout(async () => {
+        if (found || mode !== 'scan' || !videoRef.current) return
+        try {
+          const stillResult = await QrScanner.scanImage(videoRef.current, {
+            returnDetailedScanResult: true
+          })
+          if (stillResult) handleResult(stillResult)
+          else setScanInfo('Sin lectura aún. Acerca el QR y mejora la iluminación.')
+        } catch {
+          setScanInfo('Intento manual sin éxito. Reacomoda el QR.')
+        }
+      }, 8000)
     } catch (err) {
       console.error(err)
       const maybeWorker = /Worker|script at|cannot be accessed|Failed to construct/i.test(String(err?.message || err))
@@ -358,6 +356,10 @@ function QrChallenge() {
     if (scannerRef.current) {
       scannerRef.current.stop()
       scannerRef.current = null
+    }
+    if (manualFallbackTimeoutRef.current) {
+      clearTimeout(manualFallbackTimeoutRef.current)
+      manualFallbackTimeoutRef.current = null
     }
     stopMediaTracks()
     setIsScanning(false)
@@ -434,6 +436,11 @@ function QrChallenge() {
             {!error && (
               <InfoBox>
                 {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '📷 Apunta la cámara a un QR de la cacería'}
+                {debug && (
+                  <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+                    Debug: intentos {attempts} | resolución tentativa {videoRef.current?.videoWidth}x{videoRef.current?.videoHeight}
+                  </div>
+                )}
               </InfoBox>
             )}
             {error && <ErrorBox>{error}</ErrorBox>}
