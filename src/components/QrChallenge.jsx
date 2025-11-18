@@ -80,6 +80,41 @@ const sadPulse = keyframes`
   }
 `
 
+const victoryPulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+`
+
+const trophySpin = keyframes`
+  0% {
+    transform: rotate(0deg) scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(360deg) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+`
+
+const goldenShine = keyframes`
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+`
+
 const Wrap = styled(Container)`
   padding: 24px 16px;
   min-height: calc(100vh - 80px);
@@ -308,6 +343,53 @@ const FakeMessage = styled.div`
   margin-top: 12px;
 `;
 
+const VictoryCard = styled(ChallengeCard)`
+  animation: ${victoryPulse} 2s ease-in-out infinite;
+  background: linear-gradient(
+    145deg,
+    ${COLORS.gold}44,
+    ${COLORS.vitalYellow}44,
+    ${COLORS.fireOrange}44
+  );
+  background-size: 200% 200%;
+  border: 3px solid ${COLORS.gold};
+  box-shadow: 0 0 40px ${COLORS.gold}88;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      ${COLORS.gold}33,
+      transparent
+    );
+    animation: ${goldenShine} 3s linear infinite;
+  }
+`;
+
+const TrophyEmoji = styled.div`
+  font-size: 96px;
+  animation: ${trophySpin} 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  filter: drop-shadow(0 0 20px ${COLORS.gold});
+`;
+
+const VictoryText = styled.div`
+  color: ${COLORS.white};
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+`;
+
 // QR Hunt definitions (3 hidden codes in the event)
 const HUNT_CODES = [
   { codeId: 'EGO-1', label: 'Código 1', prize: 'Shot gratis en la barra' },
@@ -323,7 +405,7 @@ const FAKE_CODES = [
 ]
 
 function QrChallenge() {
-  const [mode, setMode] = useState('intro') // 'intro' | 'scan' | 'found' | 'found-fake'
+  const [mode, setMode] = useState('intro') // 'intro' | 'scan' | 'found' | 'found-fake' | 'completed'
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState('')
   const [scanInfo, setScanInfo] = useState('')
@@ -338,6 +420,8 @@ function QrChallenge() {
       return []
     }
   })
+  
+  const isCompleted = progress.length >= 3
   const videoRef = useRef(null)
   const scannerRef = useRef(null)
   const manualFallbackTimeoutRef = useRef(null)
@@ -444,7 +528,13 @@ function QrChallenge() {
           addProgress(realMatch.codeId)
           setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
           handleStopScanning()
-          setMode('found')
+          // Check if this completes the hunt (will be 3 after addProgress updates state)
+          const currentProgress = JSON.parse(localStorage.getItem('ego-hunt-found') || '[]')
+          if (currentProgress.length >= 3) {
+            setMode('completed')
+          } else {
+            setMode('found')
+          }
           return
         }
         
@@ -569,9 +659,15 @@ function QrChallenge() {
                 Progreso: {progress.length}/3 encontrados
               </ChallengeText>
             </ChallengeCard>
-            <ButtonGroup>
-              <Button variant="secondary" onClick={handleStartScanning}>📷 Empezar a escanear</Button>
-            </ButtonGroup>
+            {!isCompleted ? (
+              <ButtonGroup>
+                <Button variant="secondary" onClick={handleStartScanning}>📷 Empezar a escanear</Button>
+              </ButtonGroup>
+            ) : (
+              <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '66' }}>
+                🏆 ¡Ya completaste la cacería! Has encontrado los 3 códigos.
+              </InfoBox>
+            )}
           </>
         ) : mode === 'scan' ? (
           <>
@@ -635,7 +731,7 @@ function QrChallenge() {
               <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Buscar otro QR</Button>
             </ButtonGroup>
           </>
-        ) : (
+        ) : mode === 'found-fake' ? (
           <>
             <FakeCard>
               <FakeEmoji>😅</FakeEmoji>
@@ -655,7 +751,43 @@ function QrChallenge() {
               <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Seguir buscando</Button>
             </ButtonGroup>
           </>
-        )}
+        ) : mode === 'completed' ? (
+          <>
+            <ConfettiContainer>
+              {Array.from({ length: 80 }).map((_, i) => (
+                <Confetti
+                  key={i}
+                  $color={[COLORS.gold, COLORS.vitalYellow, COLORS.fireOrange, '#FFD700', '#FFA500'][i % 5]}
+                  $left={Math.random() * 100}
+                  $duration={3 + Math.random() * 2}
+                  $delay={Math.random() * 0.8}
+                />
+              ))}
+            </ConfettiContainer>
+            <VictoryCard>
+              <TrophyEmoji>🏆</TrophyEmoji>
+              <VictoryText>
+                ¡CACERÍA COMPLETADA!
+                <br />
+                <div style={{ fontSize: 18, marginTop: 12, opacity: 0.9 }}>
+                  Encontraste los 3 códigos secretos
+                </div>
+              </VictoryText>
+            </VictoryCard>
+            <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '88' }}>
+              <strong style={{ color: COLORS.vitalYellow, fontSize: 16 }}>🎉 ¡Felicidades, maestro cazador!</strong>
+              <div style={{ marginTop: 8 }}>
+                Has desbloqueado todos los premios. Ve al staff del evento con los 3 QR físicos para canjearlos.
+              </div>
+              <div style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
+                Códigos encontrados: {progress.join(', ')}
+              </div>
+            </InfoBox>
+            <ButtonGroup>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🎯 Ver progreso</Button>
+            </ButtonGroup>
+          </>
+        ) : null}
       </StyledPanel>
     </Wrap>
   )
