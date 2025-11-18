@@ -390,18 +390,18 @@ const VictoryText = styled.div`
   z-index: 1;
 `;
 
-// QR Hunt definitions (3 hidden codes in the event)
+// Treasure Hunt definitions (3 hidden treasures in the event)
 const HUNT_CODES = [
-  { codeId: 'EGO-1', label: 'Código 1', prize: 'Shot gratis en la barra' },
-  { codeId: 'EGO-2', label: 'Código 2', prize: 'Sticker pack EGO' },
-  { codeId: 'EGO-3', label: 'Código 3', prize: 'Foto Polaroid VIP' },
+  { codeId: 'EGO-1', label: 'Tesoro de Oro', prize: 'Shot gratis en la barra' },
+  { codeId: 'EGO-2', label: 'Tesoro de Plata', prize: 'Sticker pack EGO' },
+  { codeId: 'EGO-3', label: 'Tesoro de Diamante', prize: 'Foto Polaroid VIP' },
 ]
 
 // Fake QR codes (3 decoys with no prizes)
 const FAKE_CODES = [
-  { codeId: 'FAKE-1', label: 'Código Falso 1', message: '¡Casi! Este es un señuelo 😜' },
-  { codeId: 'FAKE-2', label: 'Código Falso 2', message: '¡Upss! Inténtalo de nuevo 🎭' },
-  { codeId: 'FAKE-3', label: 'Código Falso 3', message: '¡Trampa! Sigue buscando 🕵️' },
+  { codeId: 'FAKE-1', label: 'Tesoro Falso 1', message: '¡Casi! Este es un tesoro falso 😜' },
+  { codeId: 'FAKE-2', label: 'Tesoro Falso 2', message: '¡Upss! Cofre vacío, inténtalo de nuevo 🎭' },
+  { codeId: 'FAKE-3', label: 'Tesoro Falso 3', message: '¡Trampa pirata! Sigue buscando 🏴‍☠️' },
 ]
 
 function QrChallenge() {
@@ -525,25 +525,31 @@ function QrChallenge() {
         // Check if it's a real prize code
         const realMatch = HUNT_CODES.find(c => c.codeId === payload.codeId)
         if (realMatch) {
-          addProgress(realMatch.codeId)
-          setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
           handleStopScanning()
-          // Check if this completes the hunt (will be 3 after addProgress updates state)
-          const currentProgress = JSON.parse(localStorage.getItem('ego-hunt-found') || '[]')
-          if (currentProgress.length >= 3) {
-            setMode('completed')
-          } else {
-            setMode('found')
-          }
+          // Add a small delay for better UX
+          setTimeout(() => {
+            addProgress(realMatch.codeId)
+            setFound({ codeId: realMatch.codeId, prize: realMatch.prize })
+            // Check if this completes the hunt (will be 3 after addProgress updates state)
+            const currentProgress = JSON.parse(localStorage.getItem('ego-hunt-found') || '[]')
+            if (currentProgress.length >= 3) {
+              setMode('completed')
+            } else {
+              setMode('found')
+            }
+          }, 500)
           return
         }
         
         // Check if it's a fake code
         const fakeMatch = FAKE_CODES.find(c => c.codeId === payload.codeId)
         if (fakeMatch) {
-          setFound({ codeId: fakeMatch.codeId, message: fakeMatch.message })
           handleStopScanning()
-          setMode('found-fake')
+          // Add a small delay for better UX
+          setTimeout(() => {
+            setFound({ codeId: fakeMatch.codeId, message: fakeMatch.message })
+            setMode('found-fake')
+          }, 500)
           return
         }
         
@@ -622,14 +628,14 @@ function QrChallenge() {
         <div>
           {isAdmin ? (
             <>
-              <Title>�️ Admin: QR Hunt</Title>
-              <Description>Imprime estos 3 códigos y escóndelos en el evento. Quien los encuentre debe regresarlos al staff para canjear el premio.</Description>
+              <Title>🗝️ Admin: Treasure Hunt</Title>
+              <Description>Imprime estos 3 tesoros y escóndelos en el evento. Los cazadores de tesoros deben encontrarlos y regresarlos al staff para canjear sus premios.</Description>
             </>
           ) : (
             <>
-              <Title>🔎 QR Hunt</Title>
+              <Title>🏴‍☠️ Treasure Hunt</Title>
               <Description>
-                Encuentra los 3 códigos QR escondidos en el evento. Al escanear uno, verás tu premio. Para canjearlo, entrega el QR físico al staff.
+                ¡Embárcate en la búsqueda del tesoro! Encuentra los 3 tesoros escondidos en el evento. Escanea cada uno para revelar tu premio y entrégalo al staff para canjearlo.
               </Description>
             </>
           )}
@@ -654,18 +660,18 @@ function QrChallenge() {
         ) : mode === 'intro' ? (
           <>
             <ChallengeCard>
-              <ChallengeEmoji>🎯</ChallengeEmoji>
+              <ChallengeEmoji>💎</ChallengeEmoji>
               <ChallengeText>
-                Progreso: {progress.length}/3 encontrados
+                Tesoros encontrados: {progress.length}/3
               </ChallengeText>
             </ChallengeCard>
             {!isCompleted ? (
               <ButtonGroup>
-                <Button variant="secondary" onClick={handleStartScanning}>📷 Empezar a escanear</Button>
+                <Button variant="secondary" onClick={handleStartScanning}>� Buscar Tesoros</Button>
               </ButtonGroup>
             ) : (
               <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '66' }}>
-                🏆 ¡Ya completaste la cacería! Has encontrado los 3 códigos.
+                🏆 ¡Completaste la búsqueda del tesoro! Has encontrado los 3 tesoros escondidos.
               </InfoBox>
             )}
           </>
@@ -685,7 +691,7 @@ function QrChallenge() {
             </ScannerContainer>
             {!error && (
               <InfoBox>
-                {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '📷 Apunta la cámara a un QR de la cacería'}
+                {isLoadingScanner ? 'Preparando escáner…' : scanInfo || '� Apunta la cámara al tesoro escondido'}
                 {debug && (
                   <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
                     Debug: intentos {attempts} | resolución tentativa {videoRef.current?.videoWidth}x{videoRef.current?.videoHeight}
@@ -711,9 +717,9 @@ function QrChallenge() {
               ))}
             </ConfettiContainer>
             <SuccessCard>
-              <ChallengeEmoji>🎉</ChallengeEmoji>
+              <ChallengeEmoji>💎✨</ChallengeEmoji>
               <ChallengeText>
-                ¡Código encontrado!
+                ¡Tesoro encontrado!
                 <br />
                 <strong>{found?.codeId}</strong>
                 <br />
@@ -721,14 +727,14 @@ function QrChallenge() {
               </ChallengeText>
             </SuccessCard>
             <InfoBox>
-              Para canjear tu premio, entrega el QR físico al staff del evento.
+              Para canjear tu premio, entrega el tesoro (QR físico) al staff del evento.
               {found && progress.filter(id => id === found.codeId).length > 0 && (
-                <div style={{ marginTop: 8 }}>Este código ya quedó registrado en tu progreso.</div>
+                <div style={{ marginTop: 8 }}>Este tesoro ya está en tu colección.</div>
               )}
-              <div style={{ marginTop: 8 }}>Progreso: {progress.length}/3</div>
+              <div style={{ marginTop: 8 }}>Tesoros: {progress.length}/3</div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Buscar otro QR</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Buscar otro Tesoro</Button>
             </ButtonGroup>
           </>
         ) : mode === 'found-fake' ? (
@@ -744,11 +750,11 @@ function QrChallenge() {
               </FakeMessage>
             </FakeCard>
             <InfoBox style={{ background: '#3a202022', borderColor: '#ff555544' }}>
-              Este código no tiene premio, ¡pero sigue buscando! Los códigos reales están escondidos en el evento.
-              <div style={{ marginTop: 8 }}>Progreso real: {progress.length}/3</div>
+              ¡Falsa alarma! Este no es un tesoro real, ¡pero sigue buscando! Los verdaderos tesoros están escondidos en el evento.
+              <div style={{ marginTop: 8 }}>Tesoros reales: {progress.length}/3</div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Seguir buscando</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Seguir cazando</Button>
             </ButtonGroup>
           </>
         ) : mode === 'completed' ? (
@@ -765,26 +771,26 @@ function QrChallenge() {
               ))}
             </ConfettiContainer>
             <VictoryCard>
-              <TrophyEmoji>🏆</TrophyEmoji>
+              <TrophyEmoji>�‍☠️</TrophyEmoji>
               <VictoryText>
-                ¡CACERÍA COMPLETADA!
+                ¡TESOROS COMPLETADOS!
                 <br />
                 <div style={{ fontSize: 18, marginTop: 12, opacity: 0.9 }}>
-                  Encontraste los 3 códigos secretos
+                  ¡Encontraste los 3 tesoros escondidos!
                 </div>
               </VictoryText>
             </VictoryCard>
             <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '88' }}>
-              <strong style={{ color: COLORS.vitalYellow, fontSize: 16 }}>🎉 ¡Felicidades, maestro cazador!</strong>
+              <strong style={{ color: COLORS.vitalYellow, fontSize: 16 }}>🎉 ¡Felicidades, cazador de tesoros legendario!</strong>
               <div style={{ marginTop: 8 }}>
-                Has desbloqueado todos los premios. Ve al staff del evento con los 3 QR físicos para canjearlos.
+                Has completado la búsqueda del tesoro. Ve al staff del evento con los 3 tesoros (QR físicos) para canjear tus premios.
               </div>
               <div style={{ marginTop: 12, fontSize: 13, opacity: 0.8 }}>
-                Códigos encontrados: {progress.join(', ')}
+                Tesoros encontrados: {progress.join(', ')}
               </div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🎯 Ver progreso</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>💎 Ver colección</Button>
             </ButtonGroup>
           </>
         ) : null}

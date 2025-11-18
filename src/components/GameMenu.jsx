@@ -205,11 +205,11 @@ function GameMenu() {
             <CardDescription>¿Puedes adivinar la mentira?</CardDescription>
           </div>
         </Card>
-        <Card to="/game/qr-challenge" $delay={0.7} aria-label="Ir a QR Challenge">
-          <IconWrapper>📱</IconWrapper>
+        <Card to="/game/qr-challenge" $delay={0.7} aria-label="Ir a Treasure Hunt">
+          <IconWrapper>🏴‍☠️�</IconWrapper>
           <div>
-            <CardTitle>QR Challenge</CardTitle>
-            <CardDescription>Escanea y acepta el reto</CardDescription>
+            <CardTitle>Treasure Hunt</CardTitle>
+            <CardDescription>Encuentra los tesoros escondidos</CardDescription>
           </div>
         </Card>
         <Card to="/game/social-bingo" $primary $delay={0.8} aria-label="Ir a Social Bingo">

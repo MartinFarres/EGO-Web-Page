@@ -416,6 +416,83 @@ const HelperQRSection = styled.div`
   animation: ${fadeIn} 0.4s ease-out;
 `;
 
+const fireworks = keyframes`
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty));
+    opacity: 0;
+  }
+`;
+
+const CompletionOverlay = styled.div`
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+    z-index: 1;
+    pointer-events: none;
+  }
+`;
+
+const CompletionBadge = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  pointer-events: all;
+`;
+
+const CompletionEmoji = styled.div`
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: ${celebrate} 1s ease-out infinite;
+`;
+
+const CompletionTitle = styled.div`
+  color: ${COLORS.gold};
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+`;
+
+const CompletionSubtitle = styled.div`
+  color: ${COLORS.white};
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+`;
+
+const Firework = styled.div`
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: ${props => props.$color};
+  animation: ${fireworks} 1s ease-out infinite;
+  animation-delay: ${props => props.$delay}s;
+  --tx: ${props => props.$tx}px;
+  --ty: ${props => props.$ty}px;
+`;
+
+const FireworkContainer = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+`;
+
 const allTasks = [
   { id: 1, emoji: '🤝', text: 'Conoce a alguien nuevo' },
   { id: 2, emoji: '📸', text: 'Toma una selfie con alguien' },
@@ -590,28 +667,31 @@ function SocialBingo() {
           return
         }
         
-        // Valid QR scanned! Complete the task
-        if (selectedTask) {
-          setTasks(prev => prev.map(t => 
-            t.id === selectedTask.id 
-              ? { ...t, completed: true }
-              : t
-          ))
-          
-          // Show success animation
-          setCompletedTask(selectedTask)
-          setShowSuccess(true)
-          
-          // Auto-hide success message after 3 seconds
-          setTimeout(() => {
-            setShowSuccess(false)
-            setCompletedTask(null)
-          }, 3000)
-        }
-        
+        // Valid QR scanned! Add a small delay for better UX
         handleStopScanning()
-        setShowConfirmModal(false)
-        setSelectedTask(null)
+        
+        setTimeout(() => {
+          if (selectedTask) {
+            setTasks(prev => prev.map(t => 
+              t.id === selectedTask.id 
+                ? { ...t, completed: true }
+                : t
+            ))
+            
+            // Show success animation
+            setCompletedTask(selectedTask)
+            setShowSuccess(true)
+            
+            // Auto-hide success message after 3 seconds
+            setTimeout(() => {
+              setShowSuccess(false)
+              setCompletedTask(null)
+            }, 3000)
+          }
+          
+          setShowConfirmModal(false)
+          setSelectedTask(null)
+        }, 500)
       }
 
       scannerRef.current = new QrScanner(videoRef.current, handleResult, {
@@ -672,24 +752,64 @@ function SocialBingo() {
           <ProgressText>{completedCount} de 9 completadas</ProgressText>
         </div>
 
-        <BingoGrid>
-          {tasks.map(task => (
-            <BingoSquare
-              key={task.id}
-              $completed={task.completed}
-              onClick={() => handleTaskClick(task.id)}
-            >
-              <SquareEmoji>{task.emoji}</SquareEmoji>
-              <SquareText>{task.text}</SquareText>
-              {task.completed && <CheckMark>✓</CheckMark>}
-            </BingoSquare>
-          ))}
-        </BingoGrid>
+        {completedCount === 9 ? (
+          <CompletionOverlay>
+            <BingoGrid style={{ opacity: 0.4, pointerEvents: 'none' }}>
+              {tasks.map(task => (
+                <BingoSquare
+                  key={task.id}
+                  $completed={task.completed}
+                >
+                  <SquareEmoji>{task.emoji}</SquareEmoji>
+                  <SquareText>{task.text}</SquareText>
+                  {task.completed && <CheckMark>✓</CheckMark>}
+                </BingoSquare>
+              ))}
+            </BingoGrid>
+            
+            <CompletionBadge>
+              <CompletionEmoji>🏆</CompletionEmoji>
+              <CompletionTitle>¡BINGO!</CompletionTitle>
+              <CompletionSubtitle>¡Completaste todos los desafíos!</CompletionSubtitle>
+              <Button variant="primary" onClick={handleNewCard}>
+                🎯 Jugar de Nuevo
+              </Button>
+            </CompletionBadge>
 
-        {completedCount === 9 && (
-          <InfoBox>
-            🎉 ¡Felicidades! Completaste todas las tareas del Bingo Social
-          </InfoBox>
+            <FireworkContainer>
+              {Array.from({ length: 20 }).map((_, i) => {
+                const angle = (i / 20) * Math.PI * 2
+                const distance = 100 + Math.random() * 50
+                return (
+                  <Firework
+                    key={i}
+                    $color={[COLORS.gold, COLORS.vitalYellow, COLORS.fireOrange, '#FF6B9D', '#C084FC'][i % 5]}
+                    $tx={Math.cos(angle) * distance}
+                    $ty={Math.sin(angle) * distance}
+                    $delay={i * 0.1}
+                    style={{
+                      left: '50%',
+                      top: '50%'
+                    }}
+                  />
+                )
+              })}
+            </FireworkContainer>
+          </CompletionOverlay>
+        ) : (
+          <BingoGrid>
+            {tasks.map(task => (
+              <BingoSquare
+                key={task.id}
+                $completed={task.completed}
+                onClick={() => handleTaskClick(task.id)}
+              >
+                <SquareEmoji>{task.emoji}</SquareEmoji>
+                <SquareText>{task.text}</SquareText>
+                {task.completed && <CheckMark>✓</CheckMark>}
+              </BingoSquare>
+            ))}
+          </BingoGrid>
         )}
 
         <HelperSection>
@@ -721,16 +841,18 @@ function SocialBingo() {
           )}
         </HelperSection>
 
-        <ButtonGroup>
-          <Button variant="primary" onClick={handleNewCard}>
-            🔄 Nueva Tarjeta
-          </Button>
-          {completedCount > 0 && (
-            <Button variant="outline" onClick={() => setTasks(prev => prev.map(t => ({ ...t, completed: false })))}>
-              ↺ Reiniciar
+        {completedCount < 9 && (
+          <ButtonGroup>
+            <Button variant="primary" onClick={handleNewCard}>
+              🔄 Nueva Tarjeta
             </Button>
-          )}
-        </ButtonGroup>
+            {completedCount > 0 && (
+              <Button variant="outline" onClick={() => setTasks(prev => prev.map(t => ({ ...t, completed: false })))}>
+                ↺ Reiniciar
+              </Button>
+            )}
+          </ButtonGroup>
+        )}
       </StyledPanel>
 
       {/* Confirmation Modal */}
