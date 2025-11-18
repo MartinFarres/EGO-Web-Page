@@ -20,6 +20,43 @@ const fadeIn = keyframes`
   }
 `
 
+const celebrationBounce = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+`
+
+const gradientPulse = keyframes`
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+`
+
+const confettiFall = keyframes`
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+`
+
 const Wrap = styled(Container)`
   padding: 24px 16px;
   min-height: calc(100vh - 80px);
@@ -182,6 +219,52 @@ const ScannerOverlay = styled.div`
     border-left: none;
     border-top: none;
   }
+`;
+
+const SuccessCard = styled(ChallengeCard)`
+  animation: ${celebrationBounce} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+`;
+
+const PrizeText = styled.strong`
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    ${COLORS.vitalYellow},
+    ${COLORS.fireOrange},
+    ${COLORS.gold},
+    ${COLORS.vitalYellow}
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ${gradientPulse} 2s ease-in-out infinite;
+  font-size: 22px;
+`;
+
+const ConfettiContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+`;
+
+const Confetti = styled.div`
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: ${props => props.$color};
+  top: -20px;
+  left: ${props => props.$left}%;
+  animation: ${confettiFall} ${props => props.$duration}s linear forwards;
+  animation-delay: ${props => props.$delay}s;
+  border-radius: 2px;
+  opacity: 0.9;
 `;
 
 // QR Hunt definitions (3 hidden codes in the event)
@@ -449,16 +532,27 @@ function QrChallenge() {
           </>
         ) : (
           <>
-            <ChallengeCard>
+            <ConfettiContainer>
+              {Array.from({ length: 50 }).map((_, i) => (
+                <Confetti
+                  key={i}
+                  $color={[COLORS.vitalYellow, COLORS.fireOrange, COLORS.gold, '#FF6B9D', '#C084FC'][i % 5]}
+                  $left={Math.random() * 100}
+                  $duration={2 + Math.random() * 2}
+                  $delay={Math.random() * 0.5}
+                />
+              ))}
+            </ConfettiContainer>
+            <SuccessCard>
               <ChallengeEmoji>🎉</ChallengeEmoji>
               <ChallengeText>
                 ¡Código encontrado!
                 <br />
                 <strong>{found?.codeId}</strong>
                 <br />
-                Premio: {found?.prize}
+                Premio: <PrizeText>{found?.prize}</PrizeText>
               </ChallengeText>
-            </ChallengeCard>
+            </SuccessCard>
             <InfoBox>
               Para canjear tu premio, entrega el QR físico al staff del evento.
               {found && progress.filter(id => id === found.codeId).length > 0 && (
