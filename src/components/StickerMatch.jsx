@@ -326,9 +326,6 @@ function StickerMatch() {
           <Hint style={{ marginTop: '8px' }}>
             Toca la tarjeta para revelar tu código
           </Hint>
-          <InfoBox style={{ marginTop: '12px' }}>
-            🔒 Tu código está vinculado a ti hasta que hagas match con alguien
-          </InfoBox>
         </div>
 
         <FlipCardContainer>
@@ -360,7 +357,7 @@ function StickerMatch() {
             onKeyPress={(e) => e.key === 'Enter' && onConfirm()}
           />
           <InfoBox>
-            💡 Busca a alguien con el mismo sticker {myEmoji} y pídele su código. Cualquier código del grupo {myEmoji} hará match con el tuyo ({myCode}).
+            💡 Busca a alguien con el mismo sticker {myEmoji} y pídele su código.
           </InfoBox>
         </FormGroup>
 

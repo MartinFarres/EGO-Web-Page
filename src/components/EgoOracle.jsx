@@ -325,6 +325,85 @@ const ExampleText = styled.div`
   font-style: italic;
 `;
 
+const InfoButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid ${COLORS.gold}66;
+  background: linear-gradient(145deg, ${COLORS.gold}22, ${COLORS.vitalYellow}22);
+  color: ${COLORS.gold};
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  z-index: 10;
+  
+  &:hover {
+    background: linear-gradient(145deg, ${COLORS.gold}44, ${COLORS.vitalYellow}44);
+    border-color: ${COLORS.gold};
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px ${COLORS.gold}44;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const HelpModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: ${COLORS.black}dd;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 20px;
+  animation: ${fadeIn} 0.3s ease-out;
+`;
+
+const HelpContent = styled.div`
+  background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+  border: 2px solid ${COLORS.vitalYellow};
+  border-radius: 20px;
+  padding: 28px 24px;
+  max-width: 450px;
+  width: 100%;
+  display: grid;
+  gap: 20px;
+  box-shadow: 0 16px 48px ${COLORS.vitalYellow}44;
+  animation: ${fadeIn} 0.4s ease-out 0.1s both;
+`;
+
+const HelpTitle = styled.h3`
+  margin: 0;
+  color: ${COLORS.vitalYellow};
+  font-size: 22px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+`;
+
+const HelpText = styled.p`
+  margin: 0;
+  color: ${COLORS.white}dd;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: left;
+  font-style: italic;
+`;
+
 const archetypes = [
   {
     id: 1,
@@ -381,6 +460,7 @@ function EgoOracle() {
   const [acceptedMission, setAcceptedMission] = useState(null)
   const [timeRemaining, setTimeRemaining] = useState(0)
   const [missionStatus, setMissionStatus] = useState(null) // 'success' | 'failed' | null
+  const [showHelp, setShowHelp] = useState(false)
 
   const MISSION_DURATION = 300 // 5 minutes in seconds
 
@@ -527,16 +607,15 @@ function EgoOracle() {
             </Description>
           </div>
 
-          <MissionCard>
+          <MissionCard style={{ position: 'relative' }}>
+            {acceptedMission.example && (
+              <InfoButton onClick={() => setShowHelp(true)} title="Ver ayuda">
+                💡
+              </InfoButton>
+            )}
             <MissionCardEmoji>{acceptedMission.emoji}</MissionCardEmoji>
             <MissionCardTitle>{acceptedMission.name}</MissionCardTitle>
             <MissionCardText>{acceptedMission.mission}</MissionCardText>
-            {acceptedMission.example && (
-              <ExampleBox>
-                <ExampleLabel>💡 Ayuda</ExampleLabel>
-                <ExampleText>{acceptedMission.example}</ExampleText>
-              </ExampleBox>
-            )}
           </MissionCard>
 
           <div style={{ textAlign: 'center' }}>
@@ -571,6 +650,22 @@ function EgoOracle() {
             </Button>
           </div>
         </StyledPanel>
+
+        {/* Help Modal */}
+        {showHelp && acceptedMission?.example && (
+          <HelpModal onClick={() => setShowHelp(false)}>
+            <HelpContent onClick={(e) => e.stopPropagation()}>
+              <HelpTitle>
+                <span>💡</span>
+                <span>Ayuda</span>
+              </HelpTitle>
+              <HelpText>{acceptedMission.example}</HelpText>
+              <Button variant="primary" onClick={() => setShowHelp(false)}>
+                Entendido
+              </Button>
+            </HelpContent>
+          </HelpModal>
+        )}
       </Wrap>
     )
   }

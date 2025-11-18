@@ -340,6 +340,82 @@ const HelperText = styled.p`
   text-align: center;
 `;
 
+const celebrate = keyframes`
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+  }
+`;
+
+const successPulse = keyframes`
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 ${COLORS.gold}88;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px ${COLORS.gold}00;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 ${COLORS.gold}00;
+  }
+`;
+
+const SuccessOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: ${fadeIn} 0.3s ease-out;
+`;
+
+const SuccessCard = styled.div`
+  background: linear-gradient(145deg, ${COLORS.gold}44, ${COLORS.vitalYellow}44);
+  border: 3px solid ${COLORS.gold};
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  animation: ${celebrate} 0.6s ease-out, ${successPulse} 0.6s ease-out;
+  box-shadow: 0 20px 60px ${COLORS.gold}66;
+`;
+
+const SuccessEmoji = styled.div`
+  font-size: 72px;
+  margin-bottom: 16px;
+  animation: ${celebrate} 0.8s ease-out;
+`;
+
+const SuccessTitle = styled.h3`
+  margin: 0 0 12px 0;
+  color: ${COLORS.vitalYellow};
+  font-size: 24px;
+  font-weight: 700;
+`;
+
+const SuccessMessage = styled.p`
+  margin: 0;
+  color: ${COLORS.white};
+  font-size: 16px;
+  line-height: 1.5;
+`;
+
+const HelperQRSection = styled.div`
+  margin-top: 12px;
+  animation: ${fadeIn} 0.4s ease-out;
+`;
+
 const allTasks = [
   { id: 1, emoji: '🤝', text: 'Conoce a alguien nuevo' },
   { id: 2, emoji: '📸', text: 'Toma una selfie con alguien' },
@@ -386,10 +462,13 @@ function SocialBingo() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [showHelperModal, setShowHelperModal] = useState(false)
+  const [showHelperQR, setShowHelperQR] = useState(false)
   const [showScanner, setShowScanner] = useState(false)
   const [scanError, setScanError] = useState('')
   const [isScanning, setIsScanning] = useState(false)
   const [validationCode, setValidationCode] = useState('')
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [completedTask, setCompletedTask] = useState(null)
   
   const videoRef = useRef(null)
   const scannerRef = useRef(null)
@@ -518,6 +597,16 @@ function SocialBingo() {
               ? { ...t, completed: true }
               : t
           ))
+          
+          // Show success animation
+          setCompletedTask(selectedTask)
+          setShowSuccess(true)
+          
+          // Auto-hide success message after 3 seconds
+          setTimeout(() => {
+            setShowSuccess(false)
+            setCompletedTask(null)
+          }, 3000)
         }
         
         handleStopScanning()
@@ -606,18 +695,30 @@ function SocialBingo() {
         <HelperSection>
           <HelperTitle>🤝 Ayuda a otros</HelperTitle>
           <HelperText>
-            ¿Viste a alguien completar un desafío? ¡Ayúdales! Muestra este QR para que lo escaneen y confirmen su logro.
+            ¿Viste a alguien completar un desafío? ¡Ayúdales mostrándoles tu código QR!
           </HelperText>
-          <QrContainer>
-            <QRCode 
-              value={JSON.stringify({ type: 'ego-bingo-validation', code: validationCode })} 
-              size={180} 
-              level="H"
-            />
-          </QrContainer>
-          <HelperText style={{ fontSize: '12px', opacity: 0.7 }}>
-            Código: {validationCode}
-          </HelperText>
+          
+          {!showHelperQR ? (
+            <Button variant="primary" onClick={() => setShowHelperQR(true)}>
+              Mostrar mi QR de validación
+            </Button>
+          ) : (
+            <HelperQRSection>
+              <QrContainer>
+                <QRCode 
+                  value={JSON.stringify({ type: 'ego-bingo-validation', code: validationCode })} 
+                  size={180} 
+                  level="H"
+                />
+              </QrContainer>
+              <HelperText style={{ fontSize: '12px', opacity: 0.7, marginTop: '12px' }}>
+                Código: {validationCode}
+              </HelperText>
+              <Button variant="outline" onClick={() => setShowHelperQR(false)} style={{ marginTop: '12px' }}>
+                Ocultar QR
+              </Button>
+            </HelperQRSection>
+          )}
         </HelperSection>
 
         <ButtonGroup>
@@ -648,13 +749,13 @@ function SocialBingo() {
             )}
             
             <ModalText>
-              Para completar este desafío, necesitas que alguien que te vio completarlo escanee tu código QR con el botón de "Ayuda a otros".
+              Para completar este desafío, pídele a alguien que te vio completarlo que muestre su QR de validación.
             </ModalText>
 
             {!showScanner ? (
               <>
                 <InfoBox>
-                  💡 Pídele a alguien que escanee el QR de la sección "Ayuda a otros" en esta página
+                  💡 La otra persona debe tocar "Mostrar mi QR de validación" en la sección "Ayuda a otros"
                 </InfoBox>
                 
                 <ButtonGroup>
@@ -688,6 +789,20 @@ function SocialBingo() {
             )}
           </ModalContent>
         </ModalOverlay>
+      )}
+
+      {/* Success Animation */}
+      {showSuccess && completedTask && (
+        <SuccessOverlay onClick={() => { setShowSuccess(false); setCompletedTask(null); }}>
+          <SuccessCard>
+            <SuccessEmoji>{completedTask.emoji}</SuccessEmoji>
+            <SuccessTitle>¡Desafío Completado!</SuccessTitle>
+            <SuccessMessage>{completedTask.text}</SuccessMessage>
+            <div style={{ marginTop: '20px', fontSize: '14px', opacity: 0.8, color: COLORS.white }}>
+              {completedCount}/{tasks.length} tareas completadas
+            </div>
+          </SuccessCard>
+        </SuccessOverlay>
       )}
     </Wrap>
   )
