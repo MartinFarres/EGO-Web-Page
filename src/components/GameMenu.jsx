@@ -32,149 +32,154 @@ const float = keyframes`
 `
 
 const Section = styled.section`
-  background: ${COLORS.black};
-  padding: 48px 16px 64px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+  padding: 80px 20px 100px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, ${COLORS.white}10, transparent);
+  }
 `;
 
 const Title = styled.h2`
   text-align: center;
-  font-size: 28px;
-  font-weight: 800;
-  margin: 0 0 16px;
-  background: linear-gradient(135deg, ${COLORS.gold}, ${COLORS.vitalYellow});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: ${fadeInUp} 0.8s ease-out;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+  color: ${COLORS.white};
+  animation: ${fadeInUp} 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
 const Description = styled.p`
   text-align: center;
   color: ${COLORS.white}99;
-  margin: 0 auto 40px;
-  max-width: 500px;
-  animation: ${fadeInUp} 0.8s ease-out 0.2s backwards;
+  margin: 0 auto 56px;
+  max-width: 600px;
+  font-size: clamp(17px, 2.5vw, 21px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  animation: ${fadeInUp} 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  max-width: 900px;
+  gap: 20px;
+  max-width: 1100px;
   margin: 0 auto;
   
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
   
   @media (max-width: 480px) {
-    gap: 12px;
+    gap: 16px;
   }
 `;
 
 const Card = styled(Link)`
   position: relative;
   display: grid;
-  gap: 12px;
+  gap: 16px;
   align-content: center;
   justify-items: center;
-  min-height: 180px;
-  border-radius: 16px;
-  padding: 24px 16px;
-  background: linear-gradient(135deg, ${props => props.$primary ? COLORS.fireOrange : COLORS.vitalYellow}, ${props => props.$primary ? COLORS.vitalYellow : COLORS.gold});
-  color: ${COLORS.black};
-  font-weight: 800;
+  min-height: 200px;
+  border-radius: 20px;
+  padding: 32px 20px;
+  background: ${props => props.$primary 
+    ? 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)'
+    : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)'
+  };
+  color: ${COLORS.white};
+  font-weight: 600;
   text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: ${fadeInUp} 0.8s ease-out ${props => props.$delay}s backwards;
+  border: 1px solid ${COLORS.white}10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: ${fadeInUp} 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${props => props.$delay}s backwards;
   overflow: hidden;
   cursor: pointer;
 
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
     inset: 0;
-    border-radius: 16px;
-    padding: 2px;
-    background: linear-gradient(135deg, ${COLORS.gold}, ${COLORS.white});
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, ${COLORS.gold}40, transparent);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  &:hover {
-    transform: translateY(-12px) scale(1.05);
-    box-shadow: 0 16px 48px rgba(241, 107, 6, 0.5);
-    animation: ${float} 2s ease-in-out infinite;
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+      border-color: ${COLORS.gold}40;
 
-    &::before {
-      left: 100%;
-      transition: left 0.7s;
-    }
-
-    &::after {
-      opacity: 1;
+      &::before {
+        opacity: 1;
+      }
     }
   }
 
   &:active {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-4px) scale(0.98);
   }
 
   @media (max-width: 480px) {
-    min-height: 160px;
-    padding: 20px 12px;
+    min-height: 180px;
+    padding: 28px 16px;
   }
 `;
 
 const IconWrapper = styled.div`
-  font-size: 42px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  transition: transform 0.3s;
+  font-size: 48px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
-  ${Card}:hover & {
-    transform: scale(1.2) rotate(5deg);
+  @media (hover: hover) {
+    ${Card}:hover & {
+      transform: scale(1.1);
+    }
   }
 `;
 
 const CardTitle = styled.div`
-  font-size: 18px;
-  line-height: 1.3;
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   
   @media (max-width: 480px) {
-    font-size: 16px;
+    font-size: 17px;
   }
 `;
 
 const CardDescription = styled.div`
-  font-size: 12px;
-  font-weight: 500;
-  opacity: 0.8;
+  font-size: 14px;
+  font-weight: 400;
+  color: ${COLORS.white}99;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
   
   @media (max-width: 480px) {
-    font-size: 11px;
+    font-size: 13px;
   }
 `;
 

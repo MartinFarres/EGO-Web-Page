@@ -47,25 +47,33 @@ const Wrapper = styled.section`
   position: relative;
   height: 100vh;
   width: 100%;
-  background: radial-gradient(ellipse at top, #1a1a1a 0%, ${COLORS.black} 50%);
+  background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px 40px;
+  padding: 24px 20px 40px;
   overflow: hidden;
 
   &::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, ${COLORS.gold}08 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: ${float} 20s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 0%, ${COLORS.gold}05 0%, transparent 50%);
     pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, ${COLORS.white}10, transparent);
   }
 `;
 
@@ -74,54 +82,73 @@ const Center = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 32px;
   text-align: center;
   position: relative;
   z-index: 1;
   flex: 1;
+  max-width: 980px;
+  margin: 0 auto;
 `;
 
 const LogoWrapper = styled.div`
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
+  animation: ${scaleIn} 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 `;
 
 const Logo = styled.img`
-  width: 280px;
-  height: 280px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
-  opacity: 0.92;
-  mix-blend-mode: overlay;
-  filter: drop-shadow(0 6px 24px rgba(0,0,0,0.6));
+  opacity: 0.95;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   
   @media (max-width: 480px) {
-    width: 240px;
-    height: 240px;
+    width: 160px;
+    height: 160px;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 8px 30px rgba(0,0,0,0.6));
+    }
   }
 `;const Title = styled.h1`
   margin: 0;
-  font-size: 20px;
-  line-height: 1.5;
-  font-weight: 400;
-  background: linear-gradient(135deg, ${COLORS.gold}, ${COLORS.vitalYellow});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  max-width: 90%;
-  animation: ${fadeIn} 1s ease-out 0.3s backwards;
-  text-shadow: 0 0 30px ${COLORS.gold}33;
+  font-size: clamp(28px, 5vw, 48px);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: ${COLORS.white};
+  max-width: 800px;
+  animation: ${fadeIn} 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
   text-align: center;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    font-size: clamp(24px, 6vw, 36px);
+    line-height: 1.2;
+  }
 `;
 
 const Subtitle = styled.p`
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: 16px 0 0;
+  font-size: clamp(17px, 2.5vw, 21px);
+  line-height: 1.4;
+  font-weight: 400;
   color: ${COLORS.white}99;
-  animation: ${fadeIn} 1s ease-out 0.5s backwards;
-  font-style: italic;
+  animation: ${fadeIn} 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
   text-align: center;
+  letter-spacing: -0.01em;
+  max-width: 600px;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    font-size: clamp(15px, 3vw, 19px);
+  }
 `;
 
 const bounce = keyframes`
@@ -142,26 +169,32 @@ const ChevronWrapper = styled.div`
   left: 50%;
   transform: translateX(-50%);
   cursor: pointer;
-  padding: 16px;
-  transition: all 0.3s;
-  animation: ${fadeIn} 1s ease-out 0.7s backwards;
+  padding: 20px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: ${fadeIn} 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s backwards;
   opacity: ${props => props.$hidden ? 0 : 1};
   pointer-events: ${props => props.$hidden ? 'none' : 'auto'};
   z-index: 10;
 
-  &:hover {
-    transform: translateX(-50%) translateY(4px);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateX(-50%) translateY(2px);
+    }
+  }
+
+  &:active {
+    transform: translateX(-50%) scale(0.95);
   }
 `;
 
 const Chevron = styled.div`
-    width: 32px;
-    height: 32px;
-    border-right: 4px solid ${COLORS.vitalYellow};
-    border-bottom: 4px solid ${COLORS.vitalYellow};
-    transform: rotate(-135deg); /* point up */
-  animation: ${bounce} 2s infinite;
-  filter: drop-shadow(0 0 10px ${COLORS.vitalYellow}66);
+  width: 24px;
+  height: 24px;
+  border-right: 2px solid ${COLORS.white};
+  border-bottom: 2px solid ${COLORS.white};
+  transform: rotate(-135deg);
+  animation: ${bounce} 2.5s ease-in-out infinite;
+  opacity: 0.7;
 `;
 
 function Landing() {

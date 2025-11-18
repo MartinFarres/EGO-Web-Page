@@ -252,10 +252,10 @@ function TwoTruthsOneMask() {
 
             <ButtonGroup>
               <Button variant="secondary" onClick={handleReset}>
-                ✏️ Editar
+                Editar
               </Button>
               <Button variant="outline" onClick={handleClearAll}>
-                🔄 Reiniciar Todo
+                Reiniciar Todo
               </Button>
             </ButtonGroup>
           </>

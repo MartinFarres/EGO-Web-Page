@@ -702,7 +702,7 @@ function QrChallenge() {
                 <InfoBox>Payload: {JSON.stringify({ type: 'ego-hunt', codeId: code.codeId })}</InfoBox>
               </ChallengeCard>
             ))}
-            <Button variant="secondary" onClick={() => window.print()}>🖨️ Imprimir</Button>
+            <Button variant="secondary" onClick={() => window.print()}>Imprimir</Button>
           </>
         ) : mode === 'intro' ? (
           <>
@@ -714,7 +714,7 @@ function QrChallenge() {
             </ChallengeCard>
             {!isCompleted ? (
               <ButtonGroup>
-                <Button variant="secondary" onClick={handleStartScanning}>� Buscar Tesoros</Button>
+                <Button variant="secondary" onClick={handleStartScanning}>Buscar Tesoros</Button>
               </ButtonGroup>
             ) : (
               <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '66' }}>
@@ -750,7 +750,7 @@ function QrChallenge() {
             )}
             {error && <ErrorBox>{error}</ErrorBox>}
 
-            <Button variant="outline" onClick={() => { handleStopScanning(); setMode('intro') }}>✕ Cancelar</Button>
+            <Button variant="outline" onClick={() => { handleStopScanning(); setMode('intro') }}>Cancelar</Button>
           </>
         ) : mode === 'found' ? (
           <>
@@ -783,7 +783,7 @@ function QrChallenge() {
               <div style={{ marginTop: 8 }}>Tesoros: {progress.length}/3</div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Buscar otro Tesoro</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Buscar otro Tesoro</Button>
             </ButtonGroup>
           </>
         ) : mode === 'found-fake' ? (
@@ -803,7 +803,7 @@ function QrChallenge() {
               <div style={{ marginTop: 8 }}>Tesoros reales: {progress.length}/3</div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>🔍 Seguir cazando</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Seguir cazando</Button>
             </ButtonGroup>
           </>
         ) : mode === 'completed' ? (
@@ -839,7 +839,7 @@ function QrChallenge() {
               </div>
             </InfoBox>
             <ButtonGroup>
-              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>💎 Ver colección</Button>
+              <Button variant="secondary" onClick={() => { setFound(null); setMode('intro') }}>Ver colección</Button>
             </ButtonGroup>
           </>
         ) : null}

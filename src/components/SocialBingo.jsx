@@ -886,11 +886,11 @@ function SocialBingo() {
         {completedCount < 9 && (
           <ButtonGroup>
             <Button variant="primary" onClick={handleNewCard}>
-              🔄 Nueva Tarjeta
+              Nueva Tarjeta
             </Button>
             {completedCount > 0 && (
               <Button variant="outline" onClick={() => setTasks(prev => prev.map(t => ({ ...t, completed: false })))}>
-                ↺ Reiniciar
+                Reiniciar
               </Button>
             )}
           </ButtonGroup>
@@ -901,7 +901,7 @@ function SocialBingo() {
       {showConfirmModal && (
         <ModalOverlay onClick={(e) => e.target === e.currentTarget && handleCancelConfirmation()}>
           <ModalContent>
-            <ModalTitle>✅ Confirmar Desafío</ModalTitle>
+            <ModalTitle>Confirmar Desafío</ModalTitle>
             
             {selectedTask && (
               <div style={{ textAlign: 'center' }}>
@@ -924,7 +924,7 @@ function SocialBingo() {
                 
                 <ButtonGroup>
                   <Button variant="primary" onClick={handleStartScanning} style={{ flex: 1 }}>
-                    📷 Escanear QR
+                    Escanear QR
                   </Button>
                   <Button variant="outline" onClick={handleCancelConfirmation} style={{ flex: 1 }}>
                     Cancelar

@@ -3,49 +3,58 @@ import { COLORS } from '../../colors.js'
 
 export const Input = styled.input`
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 2px solid ${props => props.error ? '#ff4444' : '#2a2a2a'};
-  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid ${props => props.error ? '#ff4444' : `${COLORS.white}20`};
+  background: ${COLORS.white}08;
+  backdrop-filter: blur(10px);
   color: ${COLORS.white};
-  font-size: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   
   &::placeholder {
-    color: #666;
+    color: ${COLORS.white}40;
   }
 
   &:focus {
     outline: none;
-    border-color: ${COLORS.gold};
-    box-shadow: 0 0 0 3px ${COLORS.gold}22;
-    transform: translateY(-2px);
+    border-color: ${COLORS.white}40;
+    background: ${COLORS.white}12;
+    box-shadow: 0 0 0 4px ${COLORS.white}05;
   }
 
   &:hover:not(:focus) {
-    border-color: #3a3a3a;
+    border-color: ${COLORS.white}30;
+    background: ${COLORS.white}10;
   }
 `
 
 export const Select = styled.select`
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 2px solid #2a2a2a;
-  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid ${COLORS.white}20;
+  background: ${COLORS.white}08;
+  backdrop-filter: blur(10px);
   color: ${COLORS.white};
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   
   &:focus {
     outline: none;
-    border-color: ${COLORS.gold};
-    box-shadow: 0 0 0 3px ${COLORS.gold}22;
+    border-color: ${COLORS.white}40;
+    background: ${COLORS.white}12;
+    box-shadow: 0 0 0 4px ${COLORS.white}05;
   }
 
   &:hover {
-    border-color: #3a3a3a;
+    border-color: ${COLORS.white}30;
+    background: ${COLORS.white}10;
   }
 
   option {
@@ -56,9 +65,10 @@ export const Select = styled.select`
 
 export const Label = styled.label`
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: ${COLORS.vitalYellow};
+  color: ${COLORS.white};
+  letter-spacing: -0.01em;
   margin-bottom: 8px;
-  transition: color 0.3s;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 `

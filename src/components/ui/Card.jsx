@@ -23,45 +23,34 @@ const shimmer = keyframes`
 
 export const Card = styled.div`
   background: ${props => props.$gradient 
-    ? `linear-gradient(135deg, ${COLORS.fireOrange}, ${COLORS.vitalYellow})`
-    : '#0a0a0a'
+    ? `linear-gradient(135deg, ${COLORS.white}15 0%, ${COLORS.white}08 100%)`
+    : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)'
   };
-  border: 1px solid ${props => props.$borderColor || '#1d1d1d'};
-  border-radius: 16px;
-  padding: ${props => props.$padding || '20px'};
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: ${fadeIn} 0.6s ease-out;
+  border: 1px solid ${props => props.$borderColor || `${COLORS.white}10`};
+  border-radius: 20px;
+  padding: ${props => props.$padding || '24px'};
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: ${fadeIn} 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   animation-delay: ${props => props.$delay || '0s'};
   animation-fill-mode: backwards;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(20px);
 
   ${props => props.$hover && `
-    &:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 16px 40px rgba(241, 107, 6, 0.3);
-      border-color: ${COLORS.gold};
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+        border-color: ${COLORS.white}20;
+      }
     }
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-      );
-      transition: left 0.5s;
-    }
-
-    &:hover::before {
-      left: 100%;
+    &:active {
+      transform: translateY(-2px) scale(0.99);
     }
   `}
 
@@ -69,32 +58,34 @@ export const Card = styled.div`
     &::after {
       content: '';
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, ${COLORS.fireOrange}, ${COLORS.vitalYellow}, ${COLORS.gold});
-      border-radius: 16px;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: linear-gradient(135deg, ${COLORS.gold}40, transparent);
+      border-radius: 20px;
       z-index: -1;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    &:hover::after {
-      opacity: 0.3;
-      animation: ${shimmer} 2s linear infinite;
+    @media (hover: hover) {
+      &:hover::after {
+        opacity: 1;
+      }
     }
   `}
 `
 
 export const Container = styled.div`
   width: 100%;
-  max-width: ${props => props.$maxWidth || '720px'};
+  max-width: ${props => props.$maxWidth || '980px'};
   margin: 0 auto;
-  padding: ${props => props.$padding || '16px'};
+  padding: ${props => props.$padding || '20px'};
 `
 
 export const Panel = styled(Card)`
-  background: linear-gradient(145deg, #0a0a0a, #121212);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid ${COLORS.white}15;
 `

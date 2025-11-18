@@ -26,46 +26,55 @@ const StyledButton = styled.button`
   overflow: hidden;
   border: none;
   border-radius: 12px;
-  padding: 14px 24px;
-  font-weight: 700;
-  font-size: 16px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
   ${props => props.$variant === 'primary' && css`
-    background: linear-gradient(135deg, ${COLORS.fireOrange}, ${COLORS.vitalYellow});
+    background: ${COLORS.white}90;
     color: ${COLORS.black};
     
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(241, 107, 6, 0.4);
+    @media (hover: hover) {
+      &:hover {
+        background: ${COLORS.white};
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
+      }
     }
 
     &:active {
-      transform: translateY(0);
+      transform: scale(0.98);
     }
   `}
 
   ${props => props.$variant === 'secondary' && css`
-    background: ${COLORS.gold};
-    color: ${COLORS.black};
+    background: ${COLORS.white}15;
+    color: ${COLORS.white};
+    backdrop-filter: blur(10px);
     
-    &:hover {
-      background: ${COLORS.vitalYellow};
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    @media (hover: hover) {
+      &:hover {
+        background: ${COLORS.white}25;
+        transform: translateY(-2px);
+      }
     }
   `}
 
   ${props => props.$variant === 'outline' && css`
     background: transparent;
-    color: ${COLORS.gold};
-    border: 2px solid ${COLORS.gold};
+    color: ${COLORS.white};
+    border: 1px solid ${COLORS.white}30;
     
-    &:hover {
-      background: ${COLORS.gold}22;
-      transform: translateY(-2px);
+    @media (hover: hover) {
+      &:hover {
+        background: ${COLORS.white}10;
+        border-color: ${COLORS.white}50;
+        transform: translateY(-2px);
+      }
     }
   `}
 
@@ -92,7 +101,7 @@ const StyledButton = styled.button`
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none !important;
   }
