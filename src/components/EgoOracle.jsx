@@ -24,6 +24,26 @@ const shimmer = keyframes`
   }
 `
 
+const failShake = keyframes`
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+`
+
+const successBounce = keyframes`
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`
+
 const Wrap = styled(Container)`
   padding: 24px 16px;
   min-height: calc(100vh - 80px);
@@ -271,48 +291,88 @@ const ProgressCircleActive = styled.circle`
   transition: stroke-dashoffset 1s linear;
 `;
 
+const FailCard = styled(MissionCard)`
+  background: linear-gradient(145deg, #3a1a1a, #2a0d0d);
+  border-color: #ff5555;
+  animation: ${failShake} 0.6s ease-out;
+`;
+
+const SuccessCard = styled(MissionCard)`
+  animation: ${successBounce} 0.6s ease-out;
+`;
+
+const ExampleBox = styled.div`
+  background: ${COLORS.vitalYellow}11;
+  border: 1px solid ${COLORS.vitalYellow}44;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+`;
+
+const ExampleLabel = styled.div`
+  color: ${COLORS.vitalYellow};
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+`;
+
+const ExampleText = styled.div`
+  color: ${COLORS.white}cc;
+  font-size: 13px;
+  line-height: 1.6;
+  font-style: italic;
+`;
+
 const archetypes = [
   {
     id: 1,
     emoji: '🧭',
     name: 'El Explorador',
     description: 'Siempre buscando nuevas experiencias y aventuras. Tu curiosidad te lleva a descubrir territorios desconocidos.',
-    mission: 'Encuentra a alguien que nunca hayas conocido y descubre una historia fascinante de su vida.'
+    mission: 'Encuentra a alguien que nunca hayas conocido y descubre una historia fascinante de su vida.',
+    example: 'Ejemplo: Acércate a alguien y pregúntale: "¿Cuál es la aventura más loca que has vivido?" o "¿Qué te trajo aquí hoy?"'
   },
   {
     id: 2,
     emoji: '🎨',
     name: 'El Artista',
     description: 'Tu creatividad no tiene límites. Ves el mundo a través de colores, formas y posibilidades infinitas.',
-    mission: 'Crea algo con lo que encuentres en el evento: un poema, un dibujo, una foto artística.'
+    mission: 'Crea algo con lo que encuentres en el evento: un poema, un dibujo, una foto artística.',
+    example: 'Ejemplo: Escribe un haiku sobre el momento, toma una foto artística del ambiente, o dibuja algo en una servilleta.'
   },
   {
     id: 3,
     emoji: '♟️',
     name: 'El Estratega',
     description: 'Piensas varios pasos adelante. Tu mente analítica encuentra patrones y soluciones donde otros ven caos.',
-    mission: 'Ayuda a tres personas diferentes a resolver un problema o tomar una decisión.'
+    mission: 'Ayuda a tres personas diferentes a resolver un problema o tomar una decisión.',
+    example: 'Ejemplo: Ofrece consejo sobre qué bebida elegir, ayuda a alguien a decidir a quién hablarle, o sugiere un plan para el resto de la noche.'
   },
   {
     id: 4,
     emoji: '🔥',
     name: 'El Rebelde',
     description: 'Desafías las normas y creas tus propias reglas. Tu energía transforma lo ordinario en extraordinario.',
-    mission: 'Haz algo que nunca harías normalmente en un evento social. Sal de tu zona de confort.'
+    mission: 'Haz algo que nunca harías normalmente en un evento social. Sal de tu zona de confort.',
+    example: 'Ejemplo: Inicia una conversación con un extraño de forma poco convencional, propón un juego espontáneo, o baila cuando nadie más lo hace.'
   },
   {
     id: 5,
     emoji: '🎭',
     name: 'El Bufón',
     description: 'La vida es un escenario y tú eres la estrella. Tu humor y carisma iluminan cualquier espacio.',
-    mission: 'Haz reír a cinco personas diferentes. Que tu energía sea contagiosa.'
+    mission: 'Haz reír a cinco personas diferentes. Que tu energía sea contagiosa.',
+    example: 'Ejemplo: Cuenta un chiste, haz una imitación divertida, comparte una anécdota graciosa, o inventa un juego de palabras.'
   },
   {
     id: 6,
     emoji: '🌟',
     name: 'El Visionario',
     description: 'Ves el futuro antes que los demás. Tus ideas inspiran y transforman a quienes te rodean.',
-    mission: 'Comparte tu visión o sueño más grande con tres personas y escucha los suyos.'
+    mission: 'Comparte tu visión o sueño más grande con tres personas y escucha los suyos.',
+    example: 'Ejemplo: Pregunta "Si pudieras crear algo que cambie el mundo, ¿qué sería?" y comparte tu propio sueño o proyecto.'
   }
 ]
 
@@ -320,15 +380,17 @@ function EgoOracle() {
   const [selectedArchetype, setSelectedArchetype] = useState(null)
   const [acceptedMission, setAcceptedMission] = useState(null)
   const [timeRemaining, setTimeRemaining] = useState(0)
+  const [missionStatus, setMissionStatus] = useState(null) // 'success' | 'failed' | null
 
   const MISSION_DURATION = 300 // 5 minutes in seconds
 
   useEffect(() => {
-    if (acceptedMission && timeRemaining > 0) {
+    if (acceptedMission && timeRemaining > 0 && !missionStatus) {
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
             clearInterval(timer)
+            setMissionStatus('failed')
             return 0
           }
           return prev - 1
@@ -337,7 +399,7 @@ function EgoOracle() {
 
       return () => clearInterval(timer)
     }
-  }, [acceptedMission, timeRemaining])
+  }, [acceptedMission, timeRemaining, missionStatus])
 
   const handleSelectArchetype = (archetype) => {
     setSelectedArchetype(archetype)
@@ -350,12 +412,18 @@ function EgoOracle() {
   const handleAcceptMission = () => {
     setAcceptedMission(selectedArchetype)
     setTimeRemaining(MISSION_DURATION)
+    setMissionStatus(null)
     setSelectedArchetype(null)
+  }
+
+  const handleSuccess = () => {
+    setMissionStatus('success')
   }
 
   const handleNewMission = () => {
     setAcceptedMission(null)
     setTimeRemaining(0)
+    setMissionStatus(null)
   }
 
   const handleRandomArchetype = () => {
@@ -376,8 +444,79 @@ function EgoOracle() {
   const circumference = 2 * Math.PI * 50
   const strokeDashoffset = circumference - (progressPercentage / 100) * circumference
 
-  // If mission is accepted, show the mission view
+  // If mission is accepted, show the appropriate view based on status
   if (acceptedMission) {
+    // Success state
+    if (missionStatus === 'success') {
+      return (
+        <Wrap>
+          <StyledPanel $delay="0.2s">
+            <div>
+              <Title>🎉 ¡Misión Completada!</Title>
+              <Description>
+                Has demostrado ser un verdadero {acceptedMission.name}
+              </Description>
+            </div>
+
+            <SuccessCard>
+              <MissionCardEmoji>{acceptedMission.emoji}</MissionCardEmoji>
+              <MissionCardTitle>¡Éxito!</MissionCardTitle>
+              <MissionCardText>
+                Completaste tu misión con {formatTime(timeRemaining)} restantes.
+                <br />
+                <br />
+                {acceptedMission.mission}
+              </MissionCardText>
+            </SuccessCard>
+
+            <InfoBox style={{ background: COLORS.gold + '22', borderColor: COLORS.gold + '88' }}>
+              🌟 Has conectado, crecido y dejado tu marca en este evento. ¡Eres increíble!
+            </InfoBox>
+
+            <Button variant="primary" onClick={handleNewMission}>
+              ✨ Intentar Nueva Misión
+            </Button>
+          </StyledPanel>
+        </Wrap>
+      )
+    }
+
+    // Failed state
+    if (missionStatus === 'failed') {
+      return (
+        <Wrap>
+          <StyledPanel $delay="0.2s">
+            <div>
+              <Title>⏰ Tiempo Agotado</Title>
+              <Description>
+                La misión no fue completada a tiempo
+              </Description>
+            </div>
+
+            <FailCard>
+              <MissionCardEmoji>😔</MissionCardEmoji>
+              <MissionCardTitle>Misión Fallida</MissionCardTitle>
+              <MissionCardText>
+                El tiempo se acabó antes de completar tu misión.
+                <br />
+                <br />
+                Pero no te preocupes, siempre puedes intentar otra misión y demostrar tu verdadero potencial.
+              </MissionCardText>
+            </FailCard>
+
+            <InfoBox style={{ background: '#3a202022', borderColor: '#ff555544' }}>
+              💭 Recuerda: No se trata de ganar o perder, sino de atreverte a salir de tu zona de confort.
+            </InfoBox>
+
+            <Button variant="primary" onClick={handleNewMission}>
+              🔄 Intentar Otra Misión
+            </Button>
+          </StyledPanel>
+        </Wrap>
+      )
+    }
+
+    // Mission in progress
     return (
       <Wrap>
         <StyledPanel $delay="0.2s">
@@ -392,6 +531,12 @@ function EgoOracle() {
             <MissionCardEmoji>{acceptedMission.emoji}</MissionCardEmoji>
             <MissionCardTitle>{acceptedMission.name}</MissionCardTitle>
             <MissionCardText>{acceptedMission.mission}</MissionCardText>
+            {acceptedMission.example && (
+              <ExampleBox>
+                <ExampleLabel>💡 Ayuda</ExampleLabel>
+                <ExampleText>{acceptedMission.example}</ExampleText>
+              </ExampleBox>
+            )}
           </MissionCard>
 
           <div style={{ textAlign: 'center' }}>
@@ -410,24 +555,21 @@ function EgoOracle() {
               />
             </ProgressRing>
             <TimerDisplay>{formatTime(timeRemaining)}</TimerDisplay>
-            <TimerLabel>
-              {timeRemaining === 0 ? '¡Tiempo terminado!' : 'Tiempo restante'}
-            </TimerLabel>
+            <TimerLabel>Tiempo restante</TimerLabel>
           </div>
 
-          {timeRemaining === 0 ? (
-            <InfoBox>
-              🎉 ¡Misión completada! Esperamos que hayas disfrutado la experiencia
-            </InfoBox>
-          ) : (
-            <InfoBox>
-              💪 Recuerda: Esta misión es tu oportunidad para conectar y crecer
-            </InfoBox>
-          )}
+          <InfoBox>
+            💪 Esta misión es tu oportunidad para conectar y crecer
+          </InfoBox>
 
-          <Button variant="primary" onClick={handleNewMission}>
-            {timeRemaining === 0 ? '✨ Nueva Misión' : '🔄 Cambiar Misión'}
-          </Button>
+          <div style={{ display: 'grid', gap: '12px' }}>
+            <Button variant="primary" onClick={handleSuccess}>
+              ✅ ¡Misión Completada!
+            </Button>
+            <Button variant="outline" onClick={handleNewMission}>
+              🔄 Cambiar Misión
+            </Button>
+          </div>
         </StyledPanel>
       </Wrap>
     )
@@ -474,6 +616,12 @@ function EgoOracle() {
             <MissionBox>
               <MissionLabel>Tu Misión</MissionLabel>
               <MissionText>{selectedArchetype.mission}</MissionText>
+              {selectedArchetype.example && (
+                <ExampleBox>
+                  <ExampleLabel>💡 Ayuda</ExampleLabel>
+                  <ExampleText>{selectedArchetype.example}</ExampleText>
+                </ExampleBox>
+              )}
             </MissionBox>
 
             <Button variant="primary" onClick={handleAcceptMission}>

@@ -192,7 +192,7 @@ const InfoBox = styled.div`
   text-align: center;
 `;
 
-const emojiList = ['🔥','⭐','💫','✨','🎯','🎉','🦁','🃏','🎭','💬','🍀','🌟']
+const emojiList = ['🔥','⭐','💫','✨','🎯','🎉','🦁','🃏','🎭','💬','🍀','🌟','🚀','💎','🎸','⚡','🌈','🦄','👑','🎨']
 
 const icebreakers = [
   '¿Cuál es tu serie favorita ahora mismo?',
@@ -205,75 +205,112 @@ const icebreakers = [
   '¿Qué superpoder elegirías?'
 ]
 
-// Pre-generated code pairs (100 pairs so multiple people can use the app)
-// Each code has a unique partner code for matching
-const CODE_PAIRS = [
-  ['A8K3', 'B9L4'], ['C2M7', 'D6N8'], ['E4P9', 'F7Q2'], ['G3R6', 'H5S8'],
-  ['J9T2', 'K4U7'], ['L8V3', 'M2W6'], ['N7X4', 'P3Y9'], ['Q6Z5', 'R8A2'],
-  ['S4B7', 'T9C3'], ['U2D8', 'V6E4'], ['W3F9', 'X7G2'], ['Y5H8', 'Z4J3'],
-  ['A9K6', 'B2L7'], ['C8M4', 'D3N9'], ['E7P2', 'F4Q8'], ['G9R3', 'H6S7'],
-  ['J2T8', 'K7U4'], ['L3V9', 'M8W2'], ['N4X7', 'P9Y3'], ['Q2Z8', 'R7A4'],
-  ['S9B2', 'T3C8'], ['U7D4', 'V2E9'], ['W8F3', 'X4G7'], ['Y9H2', 'Z3J8'],
-  ['A4K9', 'B7L2'], ['C3M8', 'D9N4'], ['E2P7', 'F8Q3'], ['G7R9', 'H2S4'],
-  ['J8T3', 'K3U9'], ['L9V4', 'M4W7'], ['N2X8', 'P7Y4'], ['Q8Z3', 'R3A9'],
-  ['S2B8', 'T7C4'], ['U4D9', 'V9E2'], ['W3F8', 'X8G4'], ['Y2H7', 'Z8J4'],
-  ['A7K2', 'B4L9'], ['C9M3', 'D2N7'], ['E8P4', 'F3Q9'], ['G2R8', 'H9S3'],
-  ['J4T7', 'K9U2'], ['L2V8', 'M7W3'], ['N9X2', 'P4Y8'], ['Q3Z7', 'R9A3'],
-  ['S8B4', 'T2C9'], ['U3D7', 'V8E3'], ['W9F2', 'X2G8'], ['Y7H4', 'Z2J9'],
-  ['A3K7', 'B8L4'], ['C7M9', 'D4N2'], ['E3P8', 'F9Q4'], ['G8R2', 'H4S9'],
-  ['J7T4', 'K2U8'], ['L4V7', 'M9W8'], ['N3X9', 'P8Y2'], ['Q9Z4', 'R4A7'],
-  ['S3B9', 'T8C2'], ['U9D3', 'V4E8'], ['W2F7', 'X9G3'], ['Y4H9', 'Z7J2'],
-  ['A2K8', 'B3L6'], ['C4M2', 'D8N6'], ['E9P3', 'F2Q7'], ['G4R7', 'H8S2'],
-  ['J3T9', 'K8U3'], ['L7V2', 'M3W4'], ['N8X3', 'P2Y7'], ['Q4Z9', 'R2A8'],
-  ['S7B3', 'T4C7'], ['U8D2', 'V3E7'], ['W7F4', 'X3G9'], ['Y8H3', 'Z9J7'],
-  ['A6K4', 'B9L8'], ['C2M6', 'D7N3'], ['E4P6', 'F6Q2'], ['G3R4', 'H7S6'],
-  ['J9T6', 'K4U6'], ['L6V8', 'M2W9'], ['N7X6', 'P6Y9'], ['Q3Z2', 'R6A4'],
-  ['S4B6', 'T9C6'], ['U2D6', 'V7E6'], ['W6F9', 'X2G6'], ['Y3H6', 'Z4J6'],
-  ['A8K7', 'B2L3'], ['C6M8', 'D3N5'], ['E7P5', 'F4Q6'], ['G5R8', 'H6S5'],
-  ['J2T5', 'K7U5'], ['L8V5', 'M6W7'], ['N5X8', 'P3Y5'], ['Q7Z6', 'R5A2'],
-  ['S6B7', 'T2C5'], ['U5D8', 'V6E5'], ['W5F7', 'X6G2'], ['Y5H8', 'Z6J5'],
-  ['A5K6', 'B6L5'], ['C5M7', 'D5N8'], ['E6P8', 'F5Q5'], ['G6R5', 'H5S7']
-]
-
-function randomCode() {
-  // Pick a random pair and randomly choose one of the two codes
-  const pairIndex = Math.floor(Math.random() * CODE_PAIRS.length)
-  const codeIndex = Math.floor(Math.random() * 2)
-  return CODE_PAIRS[pairIndex][codeIndex]
+// Sticker groups: each emoji has multiple associated codes
+// Multiple people can have different codes but match on the same sticker
+const STICKER_GROUPS = {
+  '🔥': ['A8K3', 'B9L4', 'C2M7', 'D6N8', 'E4P9', 'F7Q2', 'G3R6', 'H5S8', 'J9T2', 'K4U7'],
+  '⭐': ['L8V3', 'M2W6', 'N7X4', 'P3Y9', 'Q6Z5', 'R8A2', 'S4B7', 'T9C3', 'U2D8', 'V6E4'],
+  '💫': ['W3F9', 'X7G2', 'Y5H8', 'Z4J3', 'A9K6', 'B2L7', 'C8M4', 'D3N9', 'E7P2', 'F4Q8'],
+  '✨': ['G9R3', 'H6S7', 'J2T8', 'K7U4', 'L3V9', 'M8W2', 'N4X7', 'P9Y3', 'Q2Z8', 'R7A4'],
+  '🎯': ['S9B2', 'T3C8', 'U7D4', 'V2E9', 'W8F3', 'X4G7', 'Y9H2', 'Z3J8', 'A4K9', 'B7L2'],
+  '🎉': ['C3M8', 'D9N4', 'E2P7', 'F8Q3', 'G7R9', 'H2S4', 'J8T3', 'K3U9', 'L9V4', 'M4W7'],
+  '🦁': ['N2X8', 'P7Y4', 'Q8Z3', 'R3A9', 'S2B8', 'T7C4', 'U4D9', 'V9E2', 'W3F8', 'X8G4'],
+  '🃏': ['Y2H7', 'Z8J4', 'A7K2', 'B4L9', 'C9M3', 'D2N7', 'E8P4', 'F3Q9', 'G2R8', 'H9S3'],
+  '🎭': ['J4T7', 'K9U2', 'L2V8', 'M7W3', 'N9X2', 'P4Y8', 'Q3Z7', 'R9A3', 'S8B4', 'T2C9'],
+  '💬': ['U3D7', 'V8E3', 'W9F2', 'X2G8', 'Y7H4', 'Z2J9', 'A3K7', 'B8L4', 'C7M9', 'D4N2'],
+  '🍀': ['E3P8', 'F9Q4', 'G8R2', 'H4S9', 'J7T4', 'K2U8', 'L4V7', 'M9W8', 'N3X9', 'P8Y2'],
+  '🌟': ['Q9Z4', 'R4A7', 'S3B9', 'T8C2', 'U9D3', 'V4E8', 'W2F7', 'X9G3', 'Y4H9', 'Z7J2'],
+  '🚀': ['A2K5', 'B8L9', 'C4M3', 'D7N6', 'E9P8', 'F2Q4', 'G6R7', 'H3S9', 'J7T6', 'K8U2'],
+  '💎': ['L9V7', 'M3W5', 'N8X6', 'P2Y4', 'Q7Z9', 'R5A8', 'S6B3', 'T4C7', 'U8D6', 'V3E9'],
+  '🎸': ['W7F5', 'X3G8', 'Y6H9', 'Z9J2', 'A5K4', 'B3L8', 'C9M6', 'D2N5', 'E6P7', 'F8Q9'],
+  '⚡': ['G4R5', 'H7S3', 'J5T9', 'K6U8', 'L2V4', 'M9W7', 'N6X5', 'P8Y3', 'Q4Z6', 'R2A5'],
+  '🌈': ['S7B9', 'T5C6', 'U9D2', 'V4E7', 'W6F8', 'X5G3', 'Y8H6', 'Z3J7', 'A6K8', 'B4L3'],
+  '🦄': ['C7M5', 'D8N9', 'E5P6', 'F9Q7', 'G2R4', 'H8S6', 'J6T5', 'K5U7', 'L7V9', 'M6W4'],
+  '👑': ['N5X7', 'P9Y6', 'Q5Z8', 'R6A9', 'S8B5', 'T6C4', 'U5D7', 'V7E6', 'W4F9', 'X6G5'],
+  '🎨': ['Y9H5', 'Z6J8', 'A4K7', 'B7L6', 'C6M9', 'D5N4', 'E8P5', 'F6Q8', 'G5R9', 'H4S7']
 }
 
-function findPartner(code) {
-  // Find the matching partner code
-  for (const pair of CODE_PAIRS) {
-    if (pair[0] === code) return pair[1]
-    if (pair[1] === code) return pair[0]
-  }
-  return null
+// Reverse lookup: code -> emoji
+const CODE_TO_EMOJI = {}
+Object.entries(STICKER_GROUPS).forEach(([emoji, codes]) => {
+  codes.forEach(code => {
+    CODE_TO_EMOJI[code] = emoji
+  })
+})
+
+function randomCodeAndEmoji() {
+  // Pick a random emoji
+  const emoji = emojiList[Math.floor(Math.random() * emojiList.length)]
+  // Pick a random code from that emoji's group
+  const codes = STICKER_GROUPS[emoji]
+  const code = codes[Math.floor(Math.random() * codes.length)]
+  return { code, emoji }
+}
+
+function getEmojiForCode(code) {
+  return CODE_TO_EMOJI[code] || null
+}
+
+function codesMatch(code1, code2) {
+  // Two codes match if they belong to the same sticker group
+  const emoji1 = getEmojiForCode(code1)
+  const emoji2 = getEmojiForCode(code2)
+  return emoji1 && emoji2 && emoji1 === emoji2
 }
 
 function StickerMatch() {
   const [myCode, setMyCode] = useState('')
+  const [myEmoji, setMyEmoji] = useState('')
   const [otherCode, setOtherCode] = useState('')
   const [matched, setMatched] = useState(false)
   const [question, setQuestion] = useState('')
   const [error, setError] = useState(false)
   const [flipped, setFlipped] = useState(false)
 
-  const emoji = useMemo(() => emojiList[Math.floor(Math.random()*emojiList.length)], [])
-
   useEffect(() => {
-    setMyCode(randomCode())
+    // Try to load existing code from localStorage
+    try {
+      const saved = localStorage.getItem('ego-sticker-match')
+      if (saved) {
+        const { code, emoji } = JSON.parse(saved)
+        if (code && emoji && CODE_TO_EMOJI[code] === emoji) {
+          setMyCode(code)
+          setMyEmoji(emoji)
+          return
+        }
+      }
+    } catch (e) {
+      console.error('Error loading saved sticker:', e)
+    }
+
+    // Generate new code if none exists or invalid
+    const { code, emoji } = randomCodeAndEmoji()
+    setMyCode(code)
+    setMyEmoji(emoji)
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('ego-sticker-match', JSON.stringify({ code, emoji }))
+    } catch (e) {
+      console.error('Error saving sticker:', e)
+    }
   }, [])
 
   const onConfirm = () => {
     const enteredCode = otherCode.trim().toUpperCase()
-    const partnerCode = findPartner(myCode)
-    const ok = enteredCode === partnerCode
+    const ok = codesMatch(myCode, enteredCode)
     setMatched(ok)
     setError(!ok && otherCode.trim() !== '')
     if (ok) {
       const q = icebreakers[Math.floor(Math.random()*icebreakers.length)]
       setQuestion(q)
+      
+      // Clear localStorage on successful match so user can get a new code
+      try {
+        localStorage.removeItem('ego-sticker-match')
+      } catch (e) {
+        console.error('Error clearing sticker:', e)
+      }
     }
   }
 
@@ -289,13 +326,16 @@ function StickerMatch() {
           <Hint style={{ marginTop: '8px' }}>
             Toca la tarjeta para revelar tu código
           </Hint>
+          <InfoBox style={{ marginTop: '12px' }}>
+            🔒 Tu código está vinculado a ti hasta que hagas match con alguien
+          </InfoBox>
         </div>
 
         <FlipCardContainer>
           <FlipCardInner $flipped={flipped} onClick={handleFlip}>
             <FlipCardFront>
               <CardLabel>Tu Sticker</CardLabel>
-              <EmojiDisplay>{emoji}</EmojiDisplay>
+              <EmojiDisplay>{myEmoji}</EmojiDisplay>
               <TapHint>👆 Toca para ver tu código</TapHint>
             </FlipCardFront>
             <FlipCardBack>
@@ -310,7 +350,7 @@ function StickerMatch() {
           <Label htmlFor="other">Código de la otra persona</Label>
           <Input
             id="other"
-            placeholder={`Ejemplo: ${findPartner(myCode) || 'ABCD'}`}
+            placeholder="Ejemplo: A8K3"
             value={otherCode}
             onChange={(e) => {
               setOtherCode(e.target.value)
@@ -320,7 +360,7 @@ function StickerMatch() {
             onKeyPress={(e) => e.key === 'Enter' && onConfirm()}
           />
           <InfoBox>
-            💡 Para probar: ingresa <strong>{findPartner(myCode)}</strong> (código par de {myCode})
+            💡 Busca a alguien con el mismo sticker {myEmoji} y pídele su código. Cualquier código del grupo {myEmoji} hará match con el tuyo ({myCode}).
           </InfoBox>
         </FormGroup>
 
