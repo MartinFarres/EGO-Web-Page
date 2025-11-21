@@ -111,7 +111,9 @@ const Card = styled(Link)`
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: ${fadeInUp} 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${props => props.$delay}s backwards;
   overflow: hidden;
-  cursor: pointer;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.$disabled ? '0.5' : '1'};
+  pointer-events: ${props => props.$disabled ? 'none' : 'auto'};
 
   &::before {
     content: '';
@@ -183,6 +185,28 @@ const CardDescription = styled.div`
   }
 `;
 
+const ComingSoonBadge = styled.div`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: ${COLORS.gold}20;
+  color: ${COLORS.gold};
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid ${COLORS.gold}40;
+  
+  @media (max-width: 480px) {
+    font-size: 11px;
+    padding: 3px 10px;
+    top: 10px;
+    right: 10px;
+  }
+`;
+
 function GameMenu() {
   return (
     <Section id="games">
@@ -210,7 +234,8 @@ function GameMenu() {
             <CardDescription>¿Puedes adivinar la mentira?</CardDescription>
           </div>
         </Card>
-        <Card to="/game/qr-challenge" $delay={0.7} aria-label="Ir a Treasure Hunt">
+        <Card as="div" $disabled $delay={0.7} aria-label="Treasure Hunt - Próximamente">
+          <ComingSoonBadge>Próximamente</ComingSoonBadge>
           <IconWrapper>🏴‍☠️</IconWrapper>
           <div>
             <CardTitle>Treasure Hunt</CardTitle>
