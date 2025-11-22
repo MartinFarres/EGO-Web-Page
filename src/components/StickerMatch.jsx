@@ -202,7 +202,29 @@ const icebreakers = [
   '¿Qué te trajo a este evento?',
   '¿Cuál es tu talento oculto?',
   '¿Café o té? ¿Por qué?',
-  '¿Qué superpoder elegirías?'
+  '¿Qué superpoder elegirías?',
+  '¿Cuál es tu bebida favorita y por qué?',
+  '¿Cuál es la anécdota más loca que tienes de un bar?',
+  'Si pudieras cenar con cualquier persona, ¿quién sería?',
+  '¿Cuál es tu mejor movimiento de baile?',
+  '¿Qué te hace reír sin falta?',
+  '¿Cuál es tu playlist perfecta para una noche como esta?',
+  '¿Cuál es el mejor consejo que te han dado?',
+  '¿Qué habilidad te gustaría aprender?',
+  '¿Cuál es tu recuerdo favorito de una fiesta?',
+  '¿Pizza o tacos? (Esta es importante)',
+  '¿Cuál es tu historia de vergüenza más divertida?',
+  '¿Qué te hace sentir más vivo?',
+  '¿Cuál es tu karaoke go-to?',
+  '¿Mañana o noche? ¿Por qué?',
+  '¿Cuál es tu guilty pleasure musical?',
+  '¿Qué te trae buena suerte?',
+  '¿Cuál es tu aperitivo perfecto?',
+  '¿Qué te hace único?',
+  '¿Cuál es tu ritual de fin de semana favorito?',
+  '¿Montaña o playa?',
+  '¿Cuál es tu mejor historia de viaje?',
+  '¿Qué banda o artista te cambió la vida?'
 ]
 
 // Sticker groups: each emoji has multiple associated codes

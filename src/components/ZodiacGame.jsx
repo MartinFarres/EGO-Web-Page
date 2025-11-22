@@ -214,73 +214,157 @@ const zodiacData = {
     "Challenge: Compra un trago para alguien que no conozcas.",
     "Phrase: Tu energía hoy es magnética y contagiosa.",
     "Challenge: Propón un brindis al grupo más cercano.",
-    "Phrase: La valentía te define, úsala para conectar."
+    "Phrase: La valentía te define, úsala para conectar.",
+    "Challenge: Inicia una conversación con la persona más alejada del bar.",
+    "Challenge: Reta a alguien a un juego de piedra, papel o tijera. El perdedor paga la siguiente ronda.",
+    "Challenge: Pide al bartender que te sorprenda con una bebida.",
+    "Challenge: Haz que 3 personas te choquen los cinco en 5 minutos.",
+    "Phrase: Hoy tu audacia abre puertas que ni imaginabas.",
+    "Challenge: Baila en tu asiento por 30 segundos sin importar quién te mire.",
+    "Phrase: El fuego interno que llevas ilumina a quienes te rodean."
   ],
   taurus: [
     "Challenge: Pregunta por el mejor lugar para comer cerca.",
     "Phrase: La paciencia te traerá una gran conversación.",
     "Challenge: Ofrece tu snack favorito a alguien nuevo.",
-    "Phrase: Tu presencia reconfortante atrae a otros."
+    "Phrase: Tu presencia reconfortante atrae a otros.",
+    "Challenge: Comparte tu trago/bebida favorita con alguien que nunca lo ha probado.",
+    "Challenge: Encuentra a alguien que comparta tu signo zodiacal.",
+    "Challenge: Recomienda tu mejor playlist a alguien del bar.",
+    "Phrase: Tu autenticidad es magnética, no la ocultes.",
+    "Challenge: Pregunta a 3 personas cuál es su mayor placer culposo.",
+    "Challenge: Pide al grupo más cercano que te recomiende un lugar para visitar.",
+    "Phrase: La estabilidad que ofreces es un imán para conexiones reales."
   ],
   gemini: [
     "Challenge: Conoce el nombre de 3 personas en 10 minutos.",
     "Phrase: Tu curiosidad abre puertas inesperadas.",
     "Challenge: Pide que te recomienden una canción.",
-    "Phrase: Las palabras son tu superpoder, úsalas bien."
+    "Phrase: Las palabras son tu superpoder, úsalas bien.",
+    "Challenge: Inicia 5 conversaciones diferentes en 10 minutos.",
+    "Challenge: Descubre qué tienen en común 3 personas desconocidas.",
+    "Challenge: Haz reír a alguien con un chiste o historia en menos de 2 minutos.",
+    "Phrase: Tu versatilidad te hace inolvidable en cualquier círculo.",
+    "Challenge: Intercambia números de teléfono con alguien nuevo para recomendar música.",
+    "Challenge: Pregunta a alguien sobre su mejor anécdota de bar.",
+    "Phrase: Tu ingenio convierte lo ordinario en extraordinario."
   ],
   cancer: [
     "Challenge: Comparte una historia emotiva con alguien.",
     "Phrase: Tu empatía crea vínculos profundos.",
     "Challenge: Pregunta por el mejor recuerdo de alguien.",
-    "Phrase: Tu intuición te guía hacia las personas correctas."
+    "Phrase: Tu intuición te guía hacia las personas correctas.",
+    "Challenge: Dale un cumplido sincero a 3 personas diferentes.",
+    "Challenge: Pregunta a alguien qué lo hace feliz y realmente escucha.",
+    "Challenge: Comparte tu bebida favorita y explica por qué significa algo para ti.",
+    "Phrase: Tu capacidad de cuidar hace que otros se sientan en casa.",
+    "Challenge: Ofrécele tu asiento a alguien que esté de pie.",
+    "Challenge: Encuentra a alguien que se vea solo y hazle compañía 5 minutos.",
+    "Phrase: Tu sensibilidad es un regalo que el mundo necesita."
   ],
   leo: [
     "Challenge: Inicia una mini ronda de fotos.",
     "Phrase: Brillas sin esfuerzo, ilumina a otros.",
     "Challenge: Halaga el outfit de alguien genuinamente.",
-    "Phrase: Tu carisma es tu carta de presentación."
+    "Phrase: Tu carisma es tu carta de presentación.",
+    "Challenge: Haz un brindis dramático que todos recuerden.",
+    "Challenge: Convence a 5 personas de unirse a una selfie grupal.",
+    "Challenge: Cuenta tu mejor historia en voz alta al grupo más cercano.",
+    "Phrase: Tu energía regia transforma cualquier ambiente.",
+    "Challenge: Inicia una ronda de aplausos para alguien del bar.",
+    "Challenge: Canta o tararea tu canción favorita en público.",
+    "Phrase: No tengas miedo de brillar, es tu naturaleza."
   ],
   virgo: [
     "Challenge: Ayuda a alguien con algo pequeño.",
     "Phrase: Tu atención al detalle es tu fortaleza.",
     "Challenge: Recomienda algo útil que hayas aprendido.",
-    "Phrase: La perfección está en cómo conectas con otros."
+    "Phrase: La perfección está en cómo conectas con otros.",
+    "Challenge: Organiza una ronda de tragos para tu grupo.",
+    "Challenge: Encuentra a alguien que necesite un consejo y compártelo.",
+    "Challenge: Pregunta a 3 personas qué los hace sentir productivos.",
+    "Phrase: Tu precisión en las pequeñas cosas crea grandes momentos.",
+    "Challenge: Ayuda al bartender a limpiar algo sin que te lo pida.",
+    "Challenge: Recomienda un libro, podcast o app útil a alguien nuevo.",
+    "Phrase: Tu servicio silencioso no pasa desapercibido."
   ],
   libra: [
     "Challenge: Junta a dos personas que no se conocen.",
     "Phrase: El balance te hace irresistible.",
     "Challenge: Pide una opinión sobre algo que te gusta.",
-    "Phrase: Tu diplomacia crea armonía dondequiera."
+    "Phrase: Tu diplomacia crea armonía dondequiera.",
+    "Challenge: Organiza un debate amistoso sobre un tema ligero.",
+    "Challenge: Media en una conversación entre dos personas con opiniones diferentes.",
+    "Challenge: Encuentra 3 cosas en común entre tú y un extraño.",
+    "Phrase: Tu habilidad para unir personas es un arte.",
+    "Challenge: Haz que dos grupos separados se unan por 10 minutos.",
+    "Challenge: Complimenta a dos personas y haz que se complimenten entre sí.",
+    "Phrase: La armonía que creas es tu firma en el mundo."
   ],
   scorpio: [
     "Challenge: Comparte un secreto inofensivo.",
     "Phrase: Tu intensidad intriga y atrae.",
     "Challenge: Pregunta por la mayor pasión de alguien.",
-    "Phrase: La profundidad es tu zona de confort."
+    "Phrase: La profundidad es tu zona de confort.",
+    "Challenge: Juega a 'Verdad o Reto' con alguien del bar.",
+    "Challenge: Descubre el mayor miedo de alguien (de forma ligera).",
+    "Challenge: Pregunta a alguien cuál es su mejor recuerdo de infancia.",
+    "Phrase: Tu misterio natural despierta curiosidad irresistible.",
+    "Challenge: Comparte tu opinión más controversial (pero respetuosa).",
+    "Challenge: Mira a alguien a los ojos por 10 segundos sin hablar.",
+    "Phrase: Tu intensidad emocional crea conexiones inolvidables."
   ],
   sagittarius: [
     "Challenge: Cuenta tu historia de viaje más loca.",
     "Phrase: Tu espíritu libre inspira aventuras.",
     "Challenge: Invita a alguien a probar algo nuevo.",
-    "Phrase: El optimismo es tu superpoder contagioso."
+    "Phrase: El optimismo es tu superpoder contagioso.",
+    "Challenge: Convence a 3 personas de hacer algo espontáneo contigo.",
+    "Challenge: Pregunta a alguien cuál es su mayor sueño de aventura.",
+    "Challenge: Propón un juego o actividad divertida al grupo.",
+    "Phrase: Tu sed de experiencias contagia a todos a tu alrededor.",
+    "Challenge: Haz una predicción divertida sobre cómo terminará la noche.",
+    "Challenge: Convence al bartender de crear un trago con tu nombre.",
+    "Phrase: Tu libertad de espíritu es inspiración pura."
   ],
   capricorn: [
     "Challenge: Comparte un logro del que estés orgulloso.",
     "Phrase: Tu determinación es admirable.",
     "Challenge: Pregunta por las metas de alguien.",
-    "Phrase: La ambición te conecta con los soñadores."
+    "Phrase: La ambición te conecta con los soñadores.",
+    "Challenge: Encuentra a alguien con tu mismo nivel de ambición y conecta.",
+    "Challenge: Comparte tu mejor consejo de vida con 3 personas.",
+    "Challenge: Pregunta a alguien qué es lo más difícil que ha logrado.",
+    "Phrase: Tu disciplina silenciosa inspira respeto y admiración.",
+    "Challenge: Organiza un brindis por los logros de todos en el bar.",
+    "Challenge: Comparte tu mayor meta para el próximo año.",
+    "Phrase: Tu liderazgo natural atrae a quienes buscan dirección."
   ],
   aquarius: [
     "Challenge: Propón una idea loca al grupo.",
     "Phrase: Tu originalidad rompe esquemas.",
     "Challenge: Pregunta por la opinión más controversial.",
-    "Phrase: Ser diferente es tu mayor regalo."
+    "Phrase: Ser diferente es tu mayor regalo.",
+    "Challenge: Inventa un juego nuevo y convence a 3 personas de jugarlo.",
+    "Challenge: Pregunta a alguien cuál es su idea más loca.",
+    "Challenge: Inicia una conversación sobre un tema inusual.",
+    "Phrase: Tu mente innovadora ve posibilidades donde otros ven límites.",
+    "Challenge: Haz algo que nadie espera de ti esta noche.",
+    "Challenge: Encuentra a la persona más única del bar y conéctate con ella.",
+    "Phrase: Tu rareza es tu mayor fortaleza, celébrala."
   ],
   pisces: [
     "Challenge: Comparte una canción que te emocione.",
     "Phrase: Tu sensibilidad artística encanta.",
     "Challenge: Pregunta por los sueños de alguien.",
-    "Phrase: La imaginación te hace único y fascinante."
+    "Phrase: La imaginación te hace único y fascinante.",
+    "Challenge: Pregunta a 3 personas qué los hace sentir vivos.",
+    "Challenge: Comparte tu fantasía más inocente con alguien.",
+    "Challenge: Haz que alguien te cuente su mejor sueño reciente.",
+    "Phrase: Tu conexión con lo invisible crea magia tangible.",
+    "Challenge: Dedícale una canción a alguien del bar (mentalmente o en voz alta).",
+    "Challenge: Pregunta a alguien qué obra de arte los representa.",
+    "Phrase: Tu empatía intuitiva toca almas sin palabras."
   ],
 }
 

@@ -452,6 +452,54 @@ const archetypes = [
     description: 'Ves el futuro antes que los demás. Tus ideas inspiran y transforman a quienes te rodean.',
     mission: 'Comparte tu visión o sueño más grande con tres personas y escucha los suyos.',
     example: 'Ejemplo: Pregunta "Si pudieras crear algo que cambie el mundo, ¿qué sería?" y comparte tu propio sueño o proyecto.'
+  },
+  {
+    id: 7,
+    emoji: '🦁',
+    name: 'El Líder',
+    description: 'Tu presencia natural inspira y guía. Las personas se sienten seguras siguiendo tu energía.',
+    mission: 'Organiza una actividad grupal espontánea que involucre a 5 o más personas.',
+    example: 'Ejemplo: Inicia una ronda de brindis, organiza un juego de preguntas grupales, o propón una competencia amistosa.'
+  },
+  {
+    id: 8,
+    emoji: '🎯',
+    name: 'El Conector',
+    description: 'Ves las conexiones invisibles entre las personas. Tu talento es unir mundos diferentes.',
+    mission: 'Junta a tres personas que no se conocen y crea una conversación memorable entre ellos.',
+    example: 'Ejemplo: Encuentra puntos en común entre extraños, presenta a personas con intereses similares, o crea un momento de conexión inesperada.'
+  },
+  {
+    id: 9,
+    emoji: '💫',
+    name: 'El Místico',
+    description: 'Tu intuición es tu brújula. Conectas con lo invisible y lees energías que otros no perciben.',
+    mission: 'Lee la energía de tres personas y comparte una observación positiva sobre cada una.',
+    example: 'Ejemplo: Acércate y di "Siento una energía creativa en ti, ¿trabajas en algo artístico?" o comparte una intuición positiva.'
+  },
+  {
+    id: 10,
+    emoji: '🎪',
+    name: 'El Animador',
+    description: 'Tu energía es contagiosa y eléctrica. Transformas cualquier momento en una celebración.',
+    mission: 'Sube el ánimo del bar: inicia un baile, canta un coro, o crea un momento épico.',
+    example: 'Ejemplo: Convence a 3 personas de bailar contigo, inicia una ola humana, o lidera un canto grupal de cumpleaños para un extraño.'
+  },
+  {
+    id: 11,
+    emoji: '🕵️',
+    name: 'El Detective',
+    description: 'Tu curiosidad es insaciable. Encuentras historias fascinantes donde otros ven solo superficies.',
+    mission: 'Descubre 5 datos fascinantes sobre 5 personas diferentes en el bar.',
+    example: 'Ejemplo: Pregunta sobre sus pasiones ocultas, talentos secretos, o experiencias más inusuales. Conviértete en un coleccionista de historias.'
+  },
+  {
+    id: 12,
+    emoji: '🌊',
+    name: 'El Sanador',
+    description: 'Tu empatía profunda calma tormentas. Las personas se sienten comprendidas en tu presencia.',
+    mission: 'Encuentra a alguien que necesite un momento de conexión genuina y ofrécele tu escucha.',
+    example: 'Ejemplo: Identifica a alguien que se vea solo o pensativo, acércate y pregunta "¿Cómo estás realmente?" y escucha de verdad.'
   }
 ]
 
